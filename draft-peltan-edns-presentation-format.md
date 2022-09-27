@@ -50,11 +50,15 @@ The key words "**MUST**", "**MUST NOT**", "**REQUIRED**",
 BCP 14 [@!RFC2119;@!RFC8174] when, and only when, they appear in all
 capitals, as shown here.
 
-EDNS(0) stands for EDNS version 0.
+* EDNS(0) stands for EDNS version 0.
 
-Decimal value means an integer displayed in decimals with no leading zeroes.
+* "Decimal value" means an integer displayed in decimals with no leading zeroes.
 
-Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits [@!RFC4648], section 8.
+* Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ([@!RFC4648], section 8).
+
+* "Followed by" in terms of strings denotes their concatenation, with no other characters nor space between them.
+
+* Iff is an abbreviation for "if and only if".
 
 # Version-independent Presentation Format {#independent}
 
@@ -62,72 +66,83 @@ EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with v
 This section specifies how to convert such OPT pseudorecord to Presentation format.
 This procedure SHOULD NOT be used for EDNS(0).
 
-OPT pseudorecord is in this case represented the same way as a RR of unknown type according to [@!RFC3597], section 5. In specific:
+OPT pseudorecord is in this case represented the same way as a RR of unknown type according to ([@!RFC3597], section 5).
+In specific:
 
 * Owner name is `.` (DNS Root Domain Name).
 
-* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see [@!RFC6891], section 6.1.3.
+* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see ([@!RFC6891], section 6.1.3).
 
 * CLASS is a text representation of the 16-bit integer at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
 This will usually result in `CLASS####` (where #### will be the Decimal value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
 
 * TYPE is either `TYPE41` or `OPT`.
 
-* RDATA is formatted by `\#`, its legth as Decimal value, and data as Base16 as per [@!RFC3597], section 5.
+* RDATA is formatted by `\#`, its legth as Decimal value, and data as Base16 as per ([@!RFC3597], section 5).
 
 Example: `. 16859136 CLASS1232 TYPE41 \# 6 000F00020015`
 
 # EDNS(0) Presentation Format
 
-EDNS(0) Presentation Format follows RR format of master file [@!RFC1035], section 5.1, including quotation of non-printable characters, multi-line format using round brackets, and semicolons denoting comments.
+EDNS(0) Presentation Format follows RR format of master file ([@!RFC1035], section 5.1), including quotation of non-printable characters, multi-line format using round brackets, and semicolons denoting comments.
 
-Owner Name MAY be omitted. If it is present, it MUST be `.` (DNS Root Domain Name).
+Depending on use-case, implementations MAY choose to display only RDATA.
+In case when resource-record-like Presentation format is desired, following applies:
 
-TTL MAY be omitted. If it is present, it MUST be `0` (zero).
-Please note, that this differs from DNS RR wire-to-txt conversion, as well as Version-independent format by (#independent).
+* Owner Name MUST be `.` (DNS Root Domain Name).
 
-CLASS MAY be omitted. If it is present, it SHOULD be `IN`. The exception is when the EDNS pseudo-record appears in a context of other class (e.g. a DNS message querying `CH` class).
+* TTL MAY be omitted.
+If it is present, it MUST be `0` (zero).
+Note that this differs from DNS RR wire-to-text conversion, as well as Version-independent format in (#independent).
 
-TYPE MUST be `EDNS0`.
+* CLASS MAY be omitted.
+If it is present, it MUST be `ANY`.
 
-RDATA consists of at least three <character-string>s [@!RFC1035], section 5.1.
+* TYPE MUST be `EDNS0`.
+
+RDATA consists of at least three <character-string>s ([@!RFC1035], section 5.1), one for each field.
+Each field consists of Field-name, followed by equal sign (`=`), followed by Field-value.
+If Field-value is empty or omitted, the equal sign MUST be omitted as well.
+For each field, Field-name and Field-value are defined by this document, or by the specification of the respective EDNS Option.
+If it is not, generic Field-name and Field-value from (#unrecognized) applies.
+However, those generics MAY be used for any Option at all times.
+
+The first three fields, (#flags), (#extrcode), and (#udpsize) MUST be always present.
+The rest of the fields are based on Options in the OPT record [@!RFC6891], section 6.1.2.
+They MUST be presented in the same order as they appear in wire format.
 It is recommended to use the multi-line format with comments at each field with more human-readable form of the contents of each option.
 See examples in (#examples).
 
-The first three <character-string>s denote:
+## Flags {#flags}
 
-* Flags as Base16 (four case-insensitive hexadecimal digits).
+First field's Field-name is `FLAGS` and its Field-value is `0` (zero) if the EDNS flags is zero.
 
-* EXTENDED-RCODE (only the upper 8 bits) as Decimal value.
-It is recommended to add a comment with resulting RCODE (all 12 bits) and its Description.
+Otherwise, Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decimal value.
+`BITn` is present in the list iff `n`-th bit (most significant bit being `0`-th) of flags is set to `1`.
+If the Flag of the bit is specified in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13), the Flag SHOULD be used insted of `BIT##`.
+(So far, the only known Flag is `DO`.)
 
-* UDP payload size as Decimal value.
+Examples: `FLAGS=0`; `FLAGS=DO`; `FLAGS=DO,BIT1`; `FLAGS=BIT3,BIT7,BIT15`.
 
-The rest of <character-string>s are one <character-string> per option.
-The options MUST be displayed in the same order as they appear in Wire format.
-Each option consists of following parts, with no separators nor spaces between them:
+## Extended RCODE {#extrcode}
 
-* Option name, which is defined for each option
+Second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, computed from both the OPT record and the DNS Message Header.
+If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKRCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
+If the extended RCODE has been computed completely and it is listed in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6), its Name should be used insted of `RCODE###`.
+The Name is case-insensitive.
 
-* Opening square bracket `[`
+Examples: `RCODE=NXDOMAIN`; `RCODE=BADSIG`; `RCODE=RCODE3841`; `RCODE=UNKRCODE3840`.
 
-* OPTION-LENGTH as Decimal value
+## UDP Payload Size {#udpsize}
 
-* Closing square bracket `]`
+Third field's Field-name is `UDPSIZE` and its Field-value is UDP payload size as Decimal value.
 
-* Equal sign `=`
+## Unrecognized Option {#unrecognized}
 
-* Option value, which is defined for each option
+EDNS options that are not part of this specification and their own specifications do not specify their Field-name and Field-value MUST be displayed according this subsection.
+Other options (specified below or otherwise) MAY be displayed so as well.
 
-If Option value is empty or omitted, the equal sign MUST be omitted as well.
-
-## Unrecognized Option
-
-At least all the options listed below MUST be recognized.
-Their Presentation format is specified by following subsections.
-Other options MAY be recognized as well, if the description of their Presentation format is part of their specification.
-
-Unrecognized option name is `OPTXX`, where `XX` stands for its OPTION-CODE, and option value is displayed as Base16.
+Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE, and Field-value is its OPTION-VALUE displayed as Base16.
 
 ## LLQ Option
 
@@ -135,66 +150,61 @@ TODO
 
 ## NSID Option
 
-NSID (OPTION-CODE 3 [@!RFC5001]) Option name is `NSID` and Option value is displayed in Base16.
+NSID (OPTION-CODE 3 [@!RFC5001]) Field-name is `NSID` and Field-value is its OPTION-VALUE displayed as Base16.
 
 It is recommended to add a comment with ASCII representation of the value.
 
 ## DAU, DHU and N3U Options
 
-DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [@!RFC6975]) Options names are `DAU`, `DHU`, and `N3U`, respectively, and their Option values cosist of comma-separated lists of ALG-CODEs as Decimal values.
+DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [@!RFC6975]) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values cosist of comma-separated lists of ALG-CODEs as Decimal values.
+
+TODO examples.
 
 ## Edns-Client-Subnet Option
 
-EDNS Client Subnet (OPTOIN-CODE 8 [@!RFC7871]) Option name is `ECS` and Option value consists of comma-separated list of fields:
+EDNS Client Subnet (OPTOIN-CODE 8 [@!RFC7871]) Field-name is `ECS` and if FAMILY is neither IP (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
+Otherwise, it consists of the textual IP or IPv6 address (TODO ref, [@!RFC2373], section 2.2), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
+If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.
 
-* FAMILY, which is `IP` for IPv4 (Address Family Number 1), `IP6` for IPv6 (Address Family Number 2), or Decimal value otherwise.
-
-* SOURCE PREFIX-LENGTH as Decimal value
-
-* SCOPE PREFIX-LENGTH as Decimal value
-
-* ADDRESS represented as:
-
-  * Comma-separated list of textual IPv4 addresses [TODO reference], if FAMILY is 1
-  
-  * Comma-separated list of testual IPv6 addresses [@!RFC2373], section 2.2, if FAMILY is 2
-  
-  * Base16 otherwise or if the ADDRESS field is of unexpected length
+Examples: `ECS=1.2.3.4/24`; `ECS=1234::2/56/48`; `ECS=000520000102030405060708`.
 
 ## EDNS EXPIRE Option
 
-EDNS EXPIRE (OPTION-CODE 9 [@!RFC7314]) Option name is `EXPIRE` and its value, if present, is displayed as Decimal value.
+EDNS EXPIRE (OPTION-CODE 9 [@!RFC7314]) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
 
 ## Cookie Option
 
-DNS Cookie (OPTION-CODE 10 [@!RFC7873]) Option name is `COOKIE` and its Option value consists of Client Cookie as Base16, followed by a comma, followed by Server Cookie as Base16.
+DNS Cookie (OPTION-CODE 10 [@!RFC7873]) Field-name is `COOKIE` and its Field-value consists of Client Cookie as Base16, followed by a comma, followed by Server Cookie as Base16.
 The comma and Server Cookie is displayed only if OPTION-LENGTH is greater than 8.
 
 ## Edns-Tcp-Keepalive Option
 
-edns-tcp-keepalive (OPTION-CODE 11 [@!RFC7828]) Option name is `KEEPALIVE` and its value is displayed as Decimal value.
+edns-tcp-keepalive (OPTION-CODE 11 [@!RFC7828]) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value.
 
 ## Padding Option
 
-Padding (OPTION-CODE 12 [@!RFC7830]) Option name is `PADDING` and its value SHOULD be omitted.
-If the value is present, it is displayed as Base16.
+Padding (OPTION-CODE 12 [@!RFC7830]) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
+If the OPTION-VALUE consists only of zero octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decimal value.
 
 ## CHAIN Option
 
-CHAIN (OPTION-CODE 13 [@!RFC7901]) Option name is `CHAIN` and its value is displayed as a textual Fully-Qualified Domain Name.
+CHAIN (OPTION-CODE 13 [@!RFC7901]) Field-name is `CHAIN` and its Field-value is displayed as a textual Fully-Qualified Domain Name.
 
 ## Edns-Key-Tag Option
 
-ends-key-tag (OPTION-CODE 14 [@!RFC8145], section 4) Option name is `KEYTAG` and its value is displayed as a comma-separated list of Decimal values.
+edns-key-tag (OPTION-CODE 14 [@!RFC8145], section 4) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
 
 ## Extended DNS Error Option
 
-Extended DNS Error (OPTION-CODE 15 [@!RFC8914]) Option name is `EDE` and Option value consists of INFO-CODE as Decimal value, followed by a single space, followed by EXTRA-TEXT as a string of UTF-8 characters.
-If EXTRA-TEXT is empty, the preceding space MUST be omitted as well.
+Extended DNS Error (OPTION-CODE 15 [@!RFC8914]) Field-name is `EDE` and Field-value is its INFO-CODE as Decimal value.
+It is recommended to add a comment with Purpose of given code ([@!RFC8914], seciton 5.2).
 
-It is recommended to add a comment with Purpose of given code[@!RFC8914], seciton 5.2.
+If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDEXT` and Field-value being the EXTRA-TEXT as-is.
 
-(Note that the (usual) presence of space within this <character-string> requires it to be inside quotes as a whole, not only the part behind `=`. Also note that non-ASCII characters and trailing zero octet in EXTRA-TEXT will be escaped by the rules of RFC1035.)
+Note that RFC1035-style escaping applies to all non-printable and non-ASCII caracters, including some eventual UTF-8 bi-charaters and possible trailing zero octet.
+Also note that any presence of spaces requires the whole <character-string> to be enclosed in quotes, not just the Field-value.
+
+TODO examples.
 
 # Examples of EDNS(0) Presentation Format {#examples}
 
@@ -203,13 +213,14 @@ It may not make really sense and should not appear in normal DNS operation.
 
 ```
 . 0 IN EDNS0 (
-	4000	; DNSSEC OK
-	1	; RCODE=23 BADCOOKIE
-	1232
-	COOKIE[16]=36714f2e8805a93d,4654b4ed3279001b
-	"EDE[12]=18 bad cookie"	; Prohibited
-	OPT1234[4]=000004d2
-	PADDING[114]
+	FLAGS=DO
+	RCODE=BADCOOKIE
+	UDPSIZE=1232
+	COOKIE=36714f2e8805a93d,4654b4ed3279001b
+	EDE=18	; Prohibited
+	"EDEXT=bad cookie\000"
+	OPT1234=000004d2
+	PADDING=[113]
 	)
 ```
 
