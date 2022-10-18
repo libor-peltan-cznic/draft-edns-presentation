@@ -37,7 +37,8 @@ organization = "NLnetLabs"
 
 .# Abstract
 
-This document describes textual presentation format of EDNS option.
+This document describes textual and JSON representation format of EDNS option.
+It also modifies the escaping rules of JSON representation of DNS messages, previously defined in [@!RFC8427].
 
 {mainmatter}
 
@@ -50,6 +51,12 @@ The EDNS[@!RFC6891] option pseudorecord does not appear in Zone Files, but it so
 This document describes such a Presentation Format of OPT pseudorecord.
 It is advised to use this when displaying an OPT pseudorecord to humans.
 It is recommended to use this when the textual format is expected to be machine-processed further.
+
+The JSON[@!RFC8259] representation[@!RFC8427] of DNS messages is also helpful as both human-readable and machine-readable format (despite the limitation in non-preservation of the order of options, which prevents reversing the conversion unambiguosly), but it did not define JSON representation of EDNS option pseudorecord.
+This document defines it.
+
+The aforementioned document[@!RFC8427] also defined ambiguous and possibly conflicting rules for escaping special characters when representing DNS names in JSON.
+This documents modifies and clarifies those rules.
 
 # Terminology
 
@@ -67,6 +74,10 @@ capitals, as shown here.
 * Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ([@!RFC4648], section 8).
 
 * "Followed by" in terms of strings denotes their concatenation, with no other characters nor space between them.
+
+* Backslash is the character called also Reverse Solidus, ASCII code 0x5c.
+
+* Zero-octet is an octet with all bits set to 0, i.e. ASCII code 0x00.
 
 # Version-independent Presentation Format {#independent}
 
@@ -166,7 +177,7 @@ It is recommended to add a comment with ASCII representation of the value.
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [@!RFC6975]) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values.
 
-Example: `DAU=15`; `Dau=15,16`;
+Example: `DAU=15`; TODO some realistic example
 
 ## Edns-Client-Subnet Option
 
@@ -192,7 +203,7 @@ The edns-tcp-keepalive (OPTION-CODE 11 [@!RFC7828]) Field-name is `KEEPALIVE` an
 ## Padding Option
 
 The Padding (OPTION-CODE 12 [@!RFC7830]) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
-If the OPTION-VALUE consists only of zero octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decimal value.
+If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decimal value.
 
 ## CHAIN Option
 
@@ -209,7 +220,7 @@ It is recommended to add a comment with Purpose of the given code ([@!RFC8914], 
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
-Note that RFC1035-style escaping applies to all non-printable and non-ASCII caracters, including some eventual UTF-8 bi-characters and possible trailing zero octet.
+Note that RFC1035-style escaping applies to all non-printable and non-ASCII caracters, including some eventual UTF-8 bi-characters and possible trailing zero-octet.
 Also note that any presence of spaces requires the whole <character-string> to be enclosed in quotes, not just the Field-value.
 
 Examples: `EDE=18; Prohibited`; `EDE=6; DNSSEC_BOGUS; "EDETXT=signature too short"`
@@ -234,9 +245,146 @@ It may not make really sense and should not appear in normal DNS operation.
 
 TODO
 
-# EDNS(0) JSON Format
+# Update Representing DNS Messages in JSON {#jsonescaping}
 
-TODO part of this document, or separately?
+This section is not related to EDNS.
+This section updates [@!RFC8427], section 2.6, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
+
+In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to ([@!RFC1035], Section 5.1) (called master file format in the referenced document), and the resulting <character-string> subsequently inserted into JSON as String.
+
+In other words, in the first step, every problematic character (non-printable, backslash, dot within Label, or any octet) is substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or, in some cases (backslash, dot, any printable character), alternatively just prepended with a backslash; in the second step, every quote (`"`) and backslash (`\`) in the resulting <character-string> is prepended with another backslash.
+As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
+
+The name MUST be represented as an absolute Fully-Qualified Domain Name.
+Internationalized Domain Name (IDN) labels MUST be expressed in their A-label form, as described in [@!RFC5890].
+
+Example: the name with the Wire format `04005C2E2203646F6D00` can be represented in JSON as `"NAME": "\\000\\\\\\046\".com."`, but also as (among other ways) `"NAME": "\\000\\092\\.\\\".c\\om."`.
+
+# Version-independent JSON representation {#jindependent}
+
+EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
+This section specifies how to represent such OPT pseudorecord in JSON.
+This procedure SHOULD NOT be used for EDNS(0).
+
+TODO!
+Ideas?
+
+# EDNS(0) Representation in JSON
+
+EDNS(0) OPT record can be represented in JSON as an object called EDNS0.
+It MUST contain the three members (name/value pairs), (#jflags), (#jextrcode), and (#judpsize).
+The rest of the members are based on Options in the OPT record [@!RFC6891], section 6.1.2.
+For each member, its name and value are defined by this document, or by the specification of the respective EDNS Option.
+If it is not, a generic name and value from (#junrecognized) applies.
+However, those generics MAY be used for any Option at all times.
+Note that the order of members is not preserved in JSON.
+
+## Flags {#jflags}
+
+The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decimal value.
+`BITn` is present in the Array if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
+If the Flag of the bit is specified in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13), the Flag SHOULD be used insted of `BIT##`.
+(So far, the only known Flag is `DO`.)
+
+## Extended RCODE {#jextrcode}
+
+The JSON member name is `RCODE` and its value is a String containing Field-value from (#extrcode).
+
+## UDP Payload Size {#judpsize}
+
+The JSON member name is `UDPSIZE` and its value is an Integer with UDP payload size.
+
+## Unrecognized Option {#junrecognized}
+
+EDNS options that are not part of this specification and their own specifications do not specify their JSON member name and value MUST be displayed according this subsection.
+Other options (specified below or otherwise) MAY be displayed so as well.
+
+Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTION-CODE as Decimal value, and its value is a String containing its OPTION-VALUE encoded as Base16.
+
+## LLQ Option
+
+TODO
+
+## NSID Option
+
+The NSID (OPTION-CODE 3 [@!RFC5001]) JSON member name is `NSID` and its value is a String containing its OPTION-VALUE encoded as Base16.
+TODO make it two-field object with both Base16 and unicode.
+
+## DAU, DHU and N3U Options
+
+The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [@!RFC6975]) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
+
+Example: TODO
+
+## Edns-Client-Subnet Option
+
+The EDNS Client Subnet (OPTION-CODE 8 [@!RFC7871]) JSON member name is `ECS` and its value is an Object with following members:
+
+* `FAMILY` - Integer with FAMILY
+* `IP` - String with textual IPv4 or IPv6 address (TODO ref, [@!RFC2373], section 2.2), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
+* `SOURCE` - Integer with SOURCE PREFIX-LENGTH
+* `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
+
+Examples: TODO
+
+## EDNS EXPIRE Option
+
+The EDNS EXPIRE (OPTION-CODE 9 [@!RFC7314]) JSON member name is `EXPIRE` and its value is either an Integer or `null`.
+
+## Cookie Option
+
+The DNS Cookie (OPTION-CODE 10 [@!RFC7873]) JSON member name is `COOKIE` and its value is an Array containing a String with the Client Cookie encoded as Base16 and, if present, another String with Server Cookie encoded as Base16.
+
+## Edns-Tcp-Keepalive Option
+
+The edns-tcp-keepalive (OPTION-CODE 11 [@!RFC7828]) JSON member name is `KEEPALIVE` and its value is an Integer.
+
+## Padding Option
+
+The Padding (OPTION-CODE 12 [@!RFC7830]) JSON member name is `PADDING` and its value is a String with its OPTION-VALUE encoded as Base16.
+If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative value consisting of an Array containing a single Integer denoting the OPTION-LENGTH.
+
+## CHAIN Option
+
+The CHAIN (OPTION-CODE 13 [@!RFC7901]) JSON member name is `CHAIN` and its value is a String with the OPTION-VALUE in the form of a textual Fully-Qualified Domain Name.
+See (#jsonescaping) for representing DNS names in JSON.
+
+## Edns-Key-Tag Option
+
+The edns-key-tag (OPTION-CODE 14 [@!RFC8145], section 4) JSON member name is `KEYTAG` and its value is an Array of Integers.
+
+## Extended DNS Error Option
+
+The Extended DNS Error (OPTION-CODE 15 [@!RFC8914]) JSON member name is `EDE` and its value is an Object with following members:
+
+* `INFO-CODE` - Integer with the INFO-CODE
+* `Purpose` - String with Purpose of the INFO-CODE ([@!RFC8914], seciton 5.2)
+* `EXTRA-TEXT` - String with the EXTRA-TEXT
+
+The EXTRA-TEXT member MUST be omitted if empty.
+If its value contains non-printable or special (backslash, quote) characters, they MUST be escaped by the means of JSON Strings ([@!RFC8259], Section 7).
+
+# Examples of EDNS(0) Representation in Json {#jexamples}
+
+The following example is the JSON representation of the first example in (#examples).
+
+```
+"EDNS0": {
+	"FLAGS": [ "DO" ],
+	"RCODE": "BADCOOKIE",
+	"UDPSIZE": 1232,
+	"COOKIE": [ "36714f2e8805a93d", "4654b4ed3279001b" ],
+	"EDE": {
+		"INFO-CODE": 18,
+		"Purpose": "Prohibited",
+		"EXTRA-TEXT": "bad cookie\u0000"
+	},
+	"OPT1234": "000004d2",
+	"PADDING": [ 113 ]
+}
+```
+
+TODO, equivalent to (#examples).
 
 # Security Considerations {#security}
 
