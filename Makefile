@@ -10,7 +10,7 @@ $(DOCNAME)-$(VERSION).html: $(DOCNAME).xml
 	xml2rfc --html -o $@ $<
 
 $(DOCNAME).xml: $(DOCNAME).md
-	sed 's/@DOCNAME@/$(DOCNAME)-$(VERSION)/g' $< | kramdown-rfc2629 > $@
+	sed 's/@DOCNAME@/$(DOCNAME)-$(VERSION)/g' $< | kramdown-rfc2629 -3 > $@
 
 clean:
 	rm -f $(DOCNAME).xml $(DOCNAME)-$(VERSION).txt $(DOCNAME)-$(VERSION).html

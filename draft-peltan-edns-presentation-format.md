@@ -22,6 +22,15 @@ author:
     org: NLnet Labs
     email: tom@nlnetlabs.nl
 
+informative:
+  IANA.EDNS.Flags:
+    target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13
+    title: EDNS Header Flags
+
+  IANA.RCODEs:
+    target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6
+    title: DNS RCODEs
+
 --- abstract
 
 This document describes textual and JSON representation format of EDNS option.
@@ -73,20 +82,19 @@ EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with v
 This section specifies how to convert such OPT pseudorecord to Presentation format.
 This procedure SHOULD NOT be used for EDNS(0).
 
-OPT pseudorecord is in this case represented the same way as a RR of unknown type according to 
-({{!RFC3597, Section 5}}).
+OPT pseudorecord is in this case represented the same way as a RR of unknown type according to {{!RFC3597, Section 5}}.
 In specific:
 
 * Owner name is `.` (DNS Root Domain Name).
 
-* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see ({{!RFC6891, Section 6.1.3}}).
+* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{!RFC6891, Section 6.1.3}}.
 
 * CLASS is a text representation of the 16-bit integer at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
 This will usually result in `CLASS####` (where #### will be the Decimal value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
 
 * TYPE is either `TYPE41` or `OPT`.
 
-* RDATA is formatted by `\#`, its legth as Decimal value, and data as Base16 as per ({{!RFC3597, Section 5}}).
+* RDATA is formatted by `\#`, its legth as Decimal value, and data as Base16 as per {{!RFC3597, Section 5}}.
 
 Example: `. 16859136 CLASS1232 TYPE41 \# 6 000F00020015`
 
@@ -101,7 +109,7 @@ In the case the resource-record-like Presentation format is desired, the followi
 
 * TTL MAY be omitted.
 If it is present, it MUST be `0` (zero).
-Note that this differs from DNS RR wire-to-text conversion, as well as Version-independent format in (#independent).
+Note that this differs from DNS RR wire-to-text conversion, as well as [Version-independent Presentation Format](#independent).
 
 * CLASS MAY be omitted.
 If it is present, it MUST be `ANY`.
@@ -112,22 +120,22 @@ RDATA consists of at least three &lt;character-string&gt;s ({{!RFC1035, Section 
 Each field consists of a Field-name, followed by an equal sign (`=`), followed by a Field-value.
 If the Field-value is empty or omitted, the equal sign MUST be omitted as well.
 For each field, the Field-name and the Field-value are defined by this document, or by the specification of the respective EDNS Option.
-If it is not, a generic Field-name and Field-value from (#unrecognized) applies.
+If it is not, a generic Field-name and Field-value from [unrecognized](#unrecognized) applies.
 However, those generics MAY be used for any Option at all times.
 
-The first three fields, (#flags), (#extrcode), and (#udpsize) MUST always be present.
+The first three fields, [Flags](#eflags), [Extended RCODE](#extrcode), and [UDP Payload Size](#udpsize) MUST always be present.
 The rest of the fields are based on Options in the OPT record {{!RFC6891, Section 6.1.2}}.
 They MUST be presented in the same order as they appear in wire format.
 It is recommended to use the multi-line format with comments at each field, together with a more human-readable form of the contents of each option when available.
-See examples of this in (#examples).
+See [Examples](#eexamples).
 
-## Flags {#flags}
+## Flags {#eflags}
 
 The first field's Field-name is `FLAGS` and its Field-value is `0` (zero) if the EDNS flags is zero.
 
 Otherwise, the Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decimal value.
 `BITn` is present in the list if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13), the Flag SHOULD be used insted of `BIT##`.
+If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used insted of `BIT##`.
 (So far, the only known Flag is `DO`.)
 
 Examples: `FLAGS=0`; `FLAGS=DO`; `FLAGS=DO,BIT1`; `FLAGS=BIT3,BIT7,BIT15`.
@@ -136,7 +144,7 @@ Examples: `FLAGS=0`; `FLAGS=DO`; `FLAGS=DO,BIT1`; `FLAGS=BIT3,BIT7,BIT15`.
 
 The second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, computed from both the OPT record and the DNS Message Header.
 If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKNOWNRCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
-If the extended RCODE has been computed completely and it is listed in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6), its Name should be used insted of `RCODE###`.
+If the extended RCODE has been computed completely and it is listed in {{IANA.RCODEs}}, its Name should be used insted of `RCODE###`.
 The Name is case-insensitive.
 
 Examples: `RCODE=NXDOMAIN`; `RCODE=BADSIG`; `RCODE=RCODE3841`; `RCODE=UNKNOWNRCODE3840`.
@@ -205,32 +213,40 @@ The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG`
 ## Extended DNS Error Option
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
-It is recommended to add a comment with Purpose of the given code ({{!RFC8914}}, seciton 5.2).
+It is recommended to add a comment with Purpose of the given code ({{!RFC8914, Section 5.2}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
 Note that RFC1035-style escaping applies to all non-printable and non-ASCII caracters, including some eventual UTF-8 bi-characters and possible trailing zero-octet.
 Also note that any presence of spaces requires the whole &lt;character-string&gt; to be enclosed in quotes, not just the Field-value.
 
-Examples: `EDE=18; Prohibited`; `EDE=6; DNSSEC_BOGUS; "EDETXT=signature too short"`
+Examples:
 
-# Examples of EDNS(0) Presentation Format {#examples}
+~~~
+EDE=18 ; Prohibited
+~~~
+~~~
+EDE=6 ; DNSSEC_BOGUS
+"EDETXT=signature too short"
+~~~
+
+# Examples of EDNS(0) Presentation Format {#eexamples}
 
 The following example shall illustrate the features of EDNS(0) Presentation format described above.
 It may not make really sense and should not appear in normal DNS operation.
 
-```
+~~~
 . 0 IN EDNS0 (
     FLAGS=DO
     RCODE=BADCOOKIE
     UDPSIZE=1232
     COOKIE=36714f2e8805a93d,4654b4ed3279001b
-    EDE=18; Prohibited
+    EDE=18 ; Prohibited
     "EDETXT=bad cookie\000"
     OPT1234=000004d2
     PADDING=[113]
     )
-```
+~~~
 
 TODO
 
@@ -239,7 +255,7 @@ TODO
 This section is not related to EDNS.
 This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
 
-In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to ({{!RFC1035, Section 5.1}}) (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently inserted into JSON as String.
+In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently inserted into JSON as String.
 
 In other words, in the first step, every problematic character (non-printable, backslash, dot within Label, or any octet) is substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or, in some cases (backslash, dot, any printable character), alternatively just prepended with a backslash; in the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
 As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
@@ -261,10 +277,10 @@ Ideas?
 # EDNS(0) Representation in JSON
 
 EDNS(0) OPT record can be represented in JSON as an object called EDNS0.
-It MUST contain the three members (name/value pairs), (#jflags), (#jextrcode), and (#judpsize).
+It MUST contain the three members (name/value pairs), [Flags](#jflags), [Extended RCODE](#jextrcode), and [UDP Payload Size](#judpsize).
 The rest of the members are based on Options in the OPT record {{!RFC6891, Section 6.1.2}}.
 For each member, its name and value are defined by this document, or by the specification of the respective EDNS Option.
-If it is not, a generic name and value from (#junrecognized) applies.
+If it is not, a generic name and value from [junrecognized](#junrecognized) applies.
 However, those generics MAY be used for any Option at all times.
 Note that the order of members is not preserved in JSON.
 
@@ -272,12 +288,12 @@ Note that the order of members is not preserved in JSON.
 
 The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decimal value.
 `BITn` is present in the Array if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in (https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13), the Flag SHOULD be used insted of `BIT##`.
+If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used insted of `BIT##`.
 (So far, the only known Flag is `DO`.)
 
 ## Extended RCODE {#jextrcode}
 
-The JSON member name is `RCODE` and its value is a String containing Field-value from (#extrcode).
+The JSON member name is `RCODE` and its value is a String containing Field-value from [extrcode](#extrcode).
 
 ## UDP Payload Size {#judpsize}
 
@@ -336,7 +352,7 @@ If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with 
 ## CHAIN Option
 
 The CHAIN (OPTION-CODE 13 {{!RFC7901}}) JSON member name is `CHAIN` and its value is a String with the OPTION-VALUE in the form of a textual Fully-Qualified Domain Name.
-See (#jsonescaping) for representing DNS names in JSON.
+See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
 
 ## Edns-Key-Tag Option
 
@@ -355,9 +371,9 @@ If its value contains non-printable or special (backslash, quote) characters, th
 
 # Examples of EDNS(0) Representation in Json {#jexamples}
 
-The following example is the JSON representation of the first example in (#examples).
+The following example is the JSON representation of the first example in [eexamples](#eexamples).
 
-```
+~~~
 "EDNS0": {
     "FLAGS": [ "DO" ],
     "RCODE": "BADCOOKIE",
@@ -371,9 +387,9 @@ The following example is the JSON representation of the first example in (#examp
     "OPT1234": "000004d2",
     "PADDING": [ 113 ]
 }
-```
+~~~
 
-TODO, equivalent to (#examples).
+TODO, equivalent to [eexamples](#eexamples).
 
 # Security Considerations {#security}
 
