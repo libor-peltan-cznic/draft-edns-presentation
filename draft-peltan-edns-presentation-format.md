@@ -81,11 +81,13 @@ capitals, as shown here.
 EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
 This section specifies how to convert such OPT pseudorecord to Presentation format.
 This procedure SHOULD NOT be used for EDNS(0).
+One possible exception is displaying a malformed EDNS(0) record.
 
 OPT pseudorecord is in this case represented the same way as a RR of unknown type according to {{!RFC3597, Section 5}}.
 In specific:
 
-* Owner name is `.` (DNS Root Domain Name).
+* Owner Name is the Owner Name of the OPT record.
+Note that this is always `.` (DNS Root Domain Name) unless malformed.
 
 * TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{!RFC6891, Section 6.1.3}}.
 
@@ -162,7 +164,10 @@ Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE
 
 ## LLQ Option
 
-TODO
+The LLQ (OPTION-CODE 1 {{!RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decimal values.
+The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{!RFC8764, Section 3.1}}.
+
+Examples: `LLQ=1,1,0,0,3600`; `LLQ=1,LLQ-SETUP,NO-ERROR,0,3600`.
 
 ## NSID Option
 
@@ -270,9 +275,22 @@ Example: the name with the Wire format `04005C2E2203646F6D00` can be represented
 EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
 This section specifies how to represent such OPT pseudorecord in JSON.
 This procedure SHOULD NOT be used for EDNS(0).
+One possible exception is displaying a malformed EDNS(0) record.
 
-TODO!
-Ideas?
+OPT pseudorecord is in this case represented in JSON as on object called EDNS with following members:
+
+* `NAME` - String with the Owner Name of the OPT record.
+Note that this is always `.` (DNS Root Domain Name) unless malformed.
+See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
+
+* `TTL` - Integer with the 32-bit big-endian value appearing at the TTL position of OPT pseudorecord Wire format, see {{!RFC6891, Section 6.1.3}}.
+
+* `CLASS` - Integer with the 16-bit value at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
+
+* `TYPE` - Integer with the value 41.
+This member MAY be omitted.
+
+* `RDATAHEX` - String with the pseudorecord RDATA formatted as Base16.
 
 # EDNS(0) Representation in JSON
 
@@ -308,7 +326,8 @@ Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTIO
 
 ## LLQ Option
 
-TODO
+The LLQ (OPTION-CODE 1 {{!RFC8764}}) JSON member nameis `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, `LLQ-LEASE`, each representing the respective value as Integer.
+Note that only numeric representation of these values is possible.
 
 ## NSID Option
 
