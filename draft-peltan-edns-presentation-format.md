@@ -349,7 +349,23 @@ The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) JSON member name is `ECS` an
 * `SOURCE` - Integer with SOURCE PREFIX-LENGTH
 * `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
 
-Examples: TODO
+Examples:
+
+~~~
+"ECS": {
+    "FAMILY": 1,
+    "IP": "1.2.3.4",
+    "SOURCE": "24"
+}
+~~~
+~~~
+"ECS": {
+    "FAMILY": 2,
+    "IP": "1234::2",
+    "SOURCE": "56",
+    "SCOPE": "48"
+}
+~~~
 
 ## EDNS EXPIRE Option
 
