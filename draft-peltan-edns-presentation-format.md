@@ -179,7 +179,7 @@ It is recommended to add a comment with ASCII representation of the value.
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values.
 
-Example: `DAU=15`; TODO some realistic example
+Example: `DAU=8,10,13,14,15; DHU=1,2,4; N3U=1;`
 
 ## Edns-Client-Subnet Option
 
@@ -338,7 +338,13 @@ TODO make it two-field object with both Base16 and unicode.
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
 
-Example: TODO
+Example:
+
+~~~
+"DAU": ["8", "10", "13", "14", "15"]
+"DHU": ["1", "2", "4"]
+"N3U": ["1"]
+~~~
 
 ## Edns-Client-Subnet Option
 
