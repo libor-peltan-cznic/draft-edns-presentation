@@ -244,7 +244,7 @@ ECS=000520000102030405060708
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, are displayed as Decimal value.
+The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
 
 ## Cookie Option
 
@@ -253,7 +253,7 @@ The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value are displayed as Decimal value.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value.
 
 ## Padding Option {#padding}
 
@@ -262,16 +262,16 @@ If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with 
 
 ## CHAIN Option
 
-The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-value address displayed as a textual Fully-Qualified Domain Name.
+The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-value, the Closest trust point, is displayed as a textual Fully-Qualified Domain Name.
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value are displayed as a comma-separated list of Decimal values.
+The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
 
 ## Extended DNS Error Option
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
-It is recommended to add a comment with the purpose of the given code ({{!RFC8914, Section 5.2}}).
+It is recommended to add a comment with the Purpose of the given code ({{!RFC8914, Section 5.2}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
@@ -318,9 +318,9 @@ They may not make really sense and should not appear in normal DNS operation.
 This section is not related to EDNS.
 This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
 
-In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is then inserted into JSON as String ({{!RFC8259, Section 7}}).
+In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is inserted into JSON as String ({{!RFC8259, Section 7}}).
 
-In other words, in the first step, every problematic character (non-printable, backslash, dot within Label, or any octet) is substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or, in some cases (backslash, dot, any printable character), or alternatively just prepended with a backslash. In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
+In other words, in the first step every problematic character (non-printable, backslash, dot within Label, or any octet) is either substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or in some cases (backslash, dot, any printable character) just prepended with a backslash. In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
 As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
 
 The name MUST be represented as an absolute Fully-Qualified Domain Name.
@@ -438,7 +438,7 @@ Example:
 
 The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
 
-* `FAMILY` - Integer with the IP FAMILY
+* `FAMILY` - Integer with FAMILY
 * `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC2373, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
 * `SOURCE` - Integer with SOURCE PREFIX-LENGTH
 * `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
