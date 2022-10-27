@@ -9,6 +9,7 @@ ipr: trust200902
 keyword: Internet-Draft
 stand_alone: yes
 submissionType: IETF
+updates: 8427
 
 author:
  -
@@ -40,11 +41,12 @@ It also modifies the escaping rules of JSON representation of DNS messages, prev
 
 # Introduction
 
-DNS records{{!RFC1035}} of any type can be converted between their binary Wire format, used in DNS messages transferred over the Internet, and textual Presentation format, used not only in Zone Files (called "master files" in the referenced document), but also to display the contents of DNS messages to humans by debugging utilities, and possible other use-cases.
+A DNS record{{!RFC1035}} of any type can be converted between its binary Wire format and textual Presentation format. The Wire format is used in DNS messages transferred over the Internet, while the Presentation format is used not only in Zone Files (called "master files" in the referenced document), but also to display the contents of DNS messages to humans by debugging utilities, and possible other use-cases.
+
 The Presentation format can be however processed also programatically and also converted back to Wire Format unambiguously.
 
-The EDNS{{!RFC6891}} option pseudorecord does not appear in Zone Files, but it sometimes needs to be converted to human-readable, but also machine-readable textual representation.
-This document describes such a Presentation Format of OPT pseudorecord.
+The EDNS{{!RFC6891}} option pseudorecord does not appear in Zone Files, but it sometimes needs to be converted to human-readable or even machine-readable textual representation.
+This document describes such a Presentation Format of the OPT pseudorecord.
 It is advised to use this when displaying an OPT pseudorecord to humans.
 It is recommended to use this when the textual format is expected to be machine-processed further.
 
@@ -98,7 +100,7 @@ This will usually result in `CLASS####` (where #### will be the Decimal value), 
 
 * TYPE is either `TYPE41` or `OPT`.
 
-* RDATA is formatted by `\#`, its legth as Decimal value, and data as Base16 as per {{!RFC3597, Section 5}}.
+* RDATA is formatted by `\#`, its length as Decimal value, and data as Base16 as per {{!RFC3597, Section 5}}.
 
 Example:
 
@@ -143,7 +145,7 @@ The first field's Field-name is `FLAGS` and its Field-value is `0` (zero) if the
 
 Otherwise, the Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decimal value.
 `BITn` is present in the list if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used insted of `BIT##`.
+If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
 (So far, the only known Flag is `DO`.)
 
 Examples:
@@ -164,7 +166,7 @@ FLAGS=BIT3,BIT7,BIT15
 
 The second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, computed from both the OPT record and the DNS Message Header.
 If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKNOWNRCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
-If the extended RCODE has been computed completely and it is listed in {{IANA.RCODEs}}, its Name should be used insted of `RCODE###`.
+If the extended RCODE has been computed completely and it is listed in {{IANA.RCODEs}}, its Name should be used instead of `RCODE###`.
 The Name is case-insensitive.
 
 Examples:
@@ -242,16 +244,16 @@ ECS=000520000102030405060708
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
+The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, are displayed as Decimal value.
 
 ## Cookie Option
 
 The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) Field-name is `COOKIE` and its Field-value consists of the Client Cookie as Base16, followed by a comma, followed by the Server Cookie as Base16.
-The comma and Server Cookie is displayed only if OPTION-LENGTH is greater than 8.
+The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 8.
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value are displayed as Decimal value.
 
 ## Padding Option {#padding}
 
@@ -260,20 +262,20 @@ If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with 
 
 ## CHAIN Option
 
-The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-value is displayed as a textual Fully-Qualified Domain Name.
+The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-value address displayed as a textual Fully-Qualified Domain Name.
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
+The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value are displayed as a comma-separated list of Decimal values.
 
 ## Extended DNS Error Option
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
-It is recommended to add a comment with Purpose of the given code ({{!RFC8914, Section 5.2}}).
+It is recommended to add a comment with the purpose of the given code ({{!RFC8914, Section 5.2}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
-Note that RFC1035-style escaping applies to all non-printable and non-ASCII caracters, including some eventual UTF-8 bi-characters and possible trailing zero-octet.
+Note that RFC1035-style escaping applies to all non-printable and non-ASCII characters, including some eventual UTF-8 bi-characters and possible trailing zero-octet.
 Also note that any presence of spaces requires the whole &lt;character-string&gt; to be enclosed in quotes, not just the Field-value.
 
 Examples:
@@ -282,7 +284,7 @@ Examples:
 EDE=18 ; Prohibited
 ~~~
 ~~~
-EDE=6 ; DNSSEC_BOGUS
+EDE=6 ; DNSSEC_Bogus
 "EDETXT=signature too short"
 ~~~
 
@@ -316,9 +318,9 @@ They may not make really sense and should not appear in normal DNS operation.
 This section is not related to EDNS.
 This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
 
-In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently inserted into JSON as String ({{!RFC8259, Section 7}}).
+In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is then inserted into JSON as String ({{!RFC8259, Section 7}}).
 
-In other words, in the first step, every problematic character (non-printable, backslash, dot within Label, or any octet) is substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or, in some cases (backslash, dot, any printable character), alternatively just prepended with a backslash; in the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
+In other words, in the first step, every problematic character (non-printable, backslash, dot within Label, or any octet) is substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or, in some cases (backslash, dot, any printable character), or alternatively just prepended with a backslash. In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
 As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
 
 The name MUST be represented as an absolute Fully-Qualified Domain Name.
@@ -330,7 +332,7 @@ Example: the name with the Wire format `04005C2E2203646F6D00` can be represented
 "NAME": "\\000\\\\\\046\".com."
 ~~~
 
-...but also as (among other ways):
+but also as (among other ways):
 
 ~~~
 "NAME": "\\000\\092\\.\\\".c\\om."
@@ -343,7 +345,7 @@ This section specifies how to represent such OPT pseudorecord in JSON.
 This procedure SHOULD NOT be used for EDNS(0).
 One possible exception is displaying a malformed EDNS(0) record.
 
-OPT pseudorecord is in this case represented in JSON as on object called `EDNS` with following members:
+The OPT pseudorecord is in this case represented in JSON as on object called `EDNS` with following members:
 
 * `NAME` - String with the Owner Name of the OPT record.
 Note that this is always `.` (DNS Root Domain Name) unless malformed.
@@ -371,8 +373,8 @@ Example:
 
 # EDNS(0) Representation in JSON
 
-EDNS(0) OPT record can be represented in JSON as an object called `EDNS0`.
-It MUST contain the three members (name/value pairs), [Flags](#jflags), [Extended RCODE](#jextrcode), and [UDP Payload Size](#judpsize).
+The EDNS(0) OPT record can be represented in JSON as an object called `EDNS0`.
+It MUST contain the three members (name-value pairs), [Flags](#jflags), [Extended RCODE](#jextrcode), and [UDP Payload Size](#judpsize).
 The rest of the members are based on Options in the OPT record {{!RFC6891, Section 6.1.2}}.
 For each member, its name and value are defined by this document, or by the specification of the respective EDNS Option.
 If it is not, a generic name and value from [junrecognized](#junrecognized) applies.
@@ -383,7 +385,7 @@ Note that the order of members is not preserved in JSON.
 
 The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decimal value.
 `BITn` is present in the Array if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used insted of `BIT##`.
+If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
 (So far, the only known Flag is `DO`.)
 
 ## Extended RCODE {#jextrcode}
@@ -403,7 +405,7 @@ Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTIO
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{!RFC8764}}) JSON member nameis `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, and `LLQ-LEASE`, each representing the respective value as Integer.
+The LLQ (OPTION-CODE 1 {{!RFC8764}}) JSON member name is `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, and `LLQ-LEASE`, each representing the respective value as Integer.
 Note that only numeric representation of these values is possible.
 
 Example:
@@ -436,8 +438,8 @@ Example:
 
 The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
 
-* `FAMILY` - Integer with FAMILY
-* `IP` - String with textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC2373, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
+* `FAMILY` - Integer with the IP FAMILY
+* `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC2373, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
 * `SOURCE` - Integer with SOURCE PREFIX-LENGTH
 * `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
 
@@ -496,7 +498,7 @@ The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) JSON member name is `K
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
 
 * `INFO-CODE` - Integer with the INFO-CODE
-* `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, seciton 5.2)
+* `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, section 5.2)
 * `EXTRA-TEXT` - String with the EXTRA-TEXT
 
 The EXTRA-TEXT member MUST be omitted if empty.
@@ -504,7 +506,7 @@ If its value contains non-printable or special (backslash, quote) characters, th
 
 # Examples of EDNS(0) Representation in Json {#jexamples}
 
-The following examplea are the JSON representations of the examples in [eexamples](#eexamples).
+The following examples are the JSON representations of the examples in [eexamples](#eexamples).
 They may not make really sense and should not appear in normal DNS operation.
 
 ~~~
