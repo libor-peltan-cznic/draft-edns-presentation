@@ -1,6 +1,6 @@
 ---
-title: EDNS Presentation Format
-abbrev: edns-presentation-format
+title: EDNS Presentation and JSON Format
+abbrev: edns-presentation-and-json-format
 docname: @DOCNAME@
 date: {DATE}
 
@@ -313,31 +313,6 @@ They may not make really sense and should not appear in normal DNS operation.
                KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
 ~~~
 
-# Update Representing DNS Messages in JSON {#jsonescaping}
-
-This section is not related to EDNS.
-This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
-
-In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is inserted into JSON as String ({{!RFC8259, Section 7}}).
-
-In other words, in the first step every problematic character (non-printable, backslash, dot within Label, or any octet) is either substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or in some cases (backslash, dot, any printable character) just prepended with a backslash. In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
-As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
-
-The name MUST be represented as an absolute Fully-Qualified Domain Name.
-Internationalized Domain Name (IDN) labels MUST be expressed in their A-label form, as described in {{!RFC5890}}.
-
-Example: the name with the Wire format `04005C2E2203646F6D00` can be represented in JSON as:
-
-~~~
-"NAME": "\\000\\\\\\046\".com."
-~~~
-
-but also as (among other ways):
-
-~~~
-"NAME": "\\000\\092\\.\\\".c\\om."
-~~~
-
 # Version-independent JSON representation {#jindependent}
 
 EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
@@ -531,6 +506,31 @@ They may not make really sense and should not appear in normal DNS operation.
            "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 600,
            "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
            "PADDING": "df24d08b0258c7de" }
+~~~
+
+# Update Representing DNS Messages in JSON {#jsonescaping}
+
+This section is not related to EDNS.
+This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which introduces contradicting MUSTs for escaping of backslashes.
+
+In order to represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is inserted into JSON as String ({{!RFC8259, Section 7}}).
+
+In other words, in the first step every problematic character (non-printable, backslash, dot within Label, or any octet) is either substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or in some cases (backslash, dot, any printable character) just prepended with a backslash. In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
+As a consequence, the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is never needed.
+
+The name MUST be represented as an absolute Fully-Qualified Domain Name.
+Internationalized Domain Name (IDN) labels MUST be expressed in their A-label form, as described in {{!RFC5890}}.
+
+Example: the name with the Wire format `04005C2E2203646F6D00` can be represented in JSON as:
+
+~~~
+"NAME": "\\000\\\\\\046\".com."
+~~~
+
+but also as (among other ways):
+
+~~~
+"NAME": "\\000\\092\\.\\\".c\\om."
 ~~~
 
 # Security Considerations {#security}
