@@ -32,6 +32,10 @@ informative:
     target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6
     title: DNS RCODEs
 
+  IANA.EDNS.EDE:
+    target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#extended-dns-error-codes
+    title: EDNS Extended Error Codes
+
 --- abstract
 
 This document describes textual and JSON representation format of EDNS option.
@@ -271,7 +275,7 @@ The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG`
 ## Extended DNS Error Option
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
-It is recommended to add a comment with the Purpose of the given code ({{!RFC8914, Section 5.2}}).
+It is recommended to add a comment with the Purpose of the given code (first presented in {{!RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
@@ -473,13 +477,13 @@ The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) JSON member name is `K
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
 
 * `INFO-CODE` - Integer with the INFO-CODE
-* `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, section 5.2)
+* `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, Section 5.2)
 * `EXTRA-TEXT` - String with the EXTRA-TEXT
 
 The EXTRA-TEXT member MUST be omitted if empty.
 If its value contains non-printable or special (backslash, quote) characters, they MUST be escaped by the means of JSON Strings ({{!RFC8259, Section 7}}).
 
-# Examples of EDNS(0) Representation in Json {#jexamples}
+# Examples of EDNS(0) Representation in JSON {#jexamples}
 
 The following examples are the JSON representations of the examples in [eexamples](#eexamples).
 They may not make really sense and should not appear in normal DNS operation.
@@ -515,7 +519,7 @@ This section updates {{!RFC8427, Section 2.6}}, including erratum 5439, which in
 
 In order to solve this contradiction and correctly represent a DNS name in JSON, it MUST be first converted to textual Presentation format according to {{!RFC1035, Section 5.1}} (called master file format in the referenced document), and the resulting &lt;character-string&gt; subsequently is inserted into JSON as String ({{!RFC8259, Section 7}}).
 
-Note that the previous paragraph prescribes following escaping strategy:
+Note that the previous paragraph prescribes the following escaping strategy:
 In the first step every problematic character (non-printable, backslash, dot within Label, or any octet) is either substituted with the sequence `\DDD`, where `DDD` is the three-digit decimal ASCII code, or in some cases (backslash, dot, any printable character) just prepended with a backslash.
 In the second step, every quote (`"`) and backslash (`\`) in the resulting &lt;character-string&gt; is prepended with another backslash.
 Note that the JSON escaping sequence `\uXXXX` (where `XXXX` is a hexadecimal Unicode code) is thus never needed.
