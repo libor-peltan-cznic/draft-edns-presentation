@@ -36,6 +36,18 @@ informative:
     target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#extended-dns-error-codes
     title: EDNS Extended Error Codes
 
+  IANA.EDNS.DAU:
+    target: https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml
+    title: DNS Security Algorithm Numbers
+
+  IANA.EDNS.DHU:
+    target: https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml#ds-rr-types-1
+    title: DNSSEC DS RR Type Digest Algorithms
+
+  IANA.EDNS.N3U:
+    target: https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml#dnssec-nsec3-parameters-3
+    title: DNSSEC NSEC3 Hash Algorithms
+
 --- abstract
 
 This document describes textual and JSON representation format of EDNS option.
@@ -218,10 +230,15 @@ It is recommended to add a comment with ASCII representation of the value.
 
 ## DAU, DHU and N3U Options
 
-The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values.
+The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
 
-Example:
+Examples:
 
+~~~
+DAU=RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
+DHU=SHA-1,SHA-256,SHA-384
+N3U=SHA-1
+~~~
 ~~~
 DAU=8,10,13,14,15
 DHU=1,2,4
