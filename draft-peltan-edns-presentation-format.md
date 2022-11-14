@@ -39,7 +39,7 @@ informative:
 --- abstract
 
 This document describes textual and JSON representation format of EDNS option.
-It also modifies the escaping rules of JSON representation of DNS messages, previously defined in {{!RFC8427}}.
+It also modifies the escaping rules of JSON representation of DNS messages, previously defined in RFC8427.
 
 --- middle
 
@@ -231,7 +231,7 @@ N3U=1
 ## Edns-Client-Subnet Option
 
 The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) Field-name is `ECS` and if FAMILY is neither IPv4 (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
-Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC2373, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
+Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
 If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.
 
 Examples:
@@ -418,7 +418,7 @@ Example:
 The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
 
 * `FAMILY` - Integer with FAMILY
-* `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC2373, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
+* `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
 * `SOURCE` - Integer with SOURCE PREFIX-LENGTH
 * `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
 
@@ -539,6 +539,10 @@ but also as (among other ways):
 ~~~
 "NAME": "\\000\\092\\.\\\".c\\om."
 ~~~
+
+# IANA Considerations {#iana}
+
+None.
 
 # Security Considerations {#security}
 
