@@ -274,7 +274,7 @@ The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value displayed in seconds.
 
 ## Padding Option {#padding}
 
@@ -474,7 +474,7 @@ The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) JSON member name is `COOKIE` and it
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is an Integer.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is an Integer displayed in seconds.
 
 ## Padding Option
 
