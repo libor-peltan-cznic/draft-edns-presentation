@@ -274,7 +274,7 @@ The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is displayed as Decimal value displayed in seconds.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.
 
 ## Padding Option {#padding}
 
@@ -330,7 +330,7 @@ They may not make really sense and should not appear in normal DNS operation.
 ~~~
 . 0 IN EDNS0 ( FLAGS=0 RCODE=BADSIG UDPSIZE=4096 EXPIRE
                NSID=6578616d706c652e636f6d2e ; example.com.
-               DAU=8,10 KEEPALIVE=600 CHAIN=zerobyte\000.com.
+               DAU=8,10 KEEPALIVE=60.0 CHAIN=zerobyte\000.com.
                KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
 ~~~
 
@@ -474,7 +474,7 @@ The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) JSON member name is `COOKIE` and it
 
 ## Edns-Tcp-Keepalive Option
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is an Integer displayed in seconds.
+The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is the TIMEOUT in seconds formatted as a Number {{!RFC8259, Section 6}} (possibly a non-Integer).
 
 ## Padding Option
 
@@ -524,7 +524,7 @@ They may not make really sense and should not appear in normal DNS operation.
 ~~~
 "EDNS0": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
            "EXPIRE": null, "NSIDHEX": "6578616d706c652e636f6d2e",
-           "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 600,
+           "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 60.0,
            "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
            "PADDING": "df24d08b0258c7de" }
 ~~~
