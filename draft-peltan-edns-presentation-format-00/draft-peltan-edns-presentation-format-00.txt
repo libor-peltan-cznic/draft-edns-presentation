@@ -6,7 +6,7 @@ Network Working Group                                          L. Peltan
 Internet-Draft                                                    CZ.NIC
 Updates: 8427 (if approved)                                    T. Carpay
 Intended status: Standards Track                              NLnet Labs
-Expires: 15 May 2023                                    11 November 2022
+Expires: 27 May 2023                                    23 November 2022
 
 
                    EDNS Presentation and JSON Format
@@ -16,7 +16,7 @@ Abstract
 
    This document describes textual and JSON representation format of
    EDNS option.  It also modifies the escaping rules of JSON
-   representation of DNS messages, previously defined in [RFC8427].
+   representation of DNS messages, previously defined in RFC8427.
 
 Status of This Memo
 
@@ -33,7 +33,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 15 May 2023.
+   This Internet-Draft will expire on 27 May 2023.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Peltan & Carpay            Expires 15 May 2023                  [Page 1]
+Peltan & Carpay            Expires 27 May 2023                  [Page 1]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
@@ -71,50 +71,51 @@ Table of Contents
      4.5.  LLQ Option  . . . . . . . . . . . . . . . . . . . . . . .   7
      4.6.  NSID Option . . . . . . . . . . . . . . . . . . . . . . .   7
      4.7.  DAU, DHU and N3U Options  . . . . . . . . . . . . . . . .   7
-     4.8.  Edns-Client-Subnet Option . . . . . . . . . . . . . . . .   7
+     4.8.  Edns-Client-Subnet Option . . . . . . . . . . . . . . . .   8
      4.9.  EDNS EXPIRE Option  . . . . . . . . . . . . . . . . . . .   8
      4.10. Cookie Option . . . . . . . . . . . . . . . . . . . . . .   8
      4.11. Edns-Tcp-Keepalive Option . . . . . . . . . . . . . . . .   8
      4.12. Padding Option  . . . . . . . . . . . . . . . . . . . . .   8
-     4.13. CHAIN Option  . . . . . . . . . . . . . . . . . . . . . .   8
-     4.14. Edns-Key-Tag Option . . . . . . . . . . . . . . . . . . .   8
+     4.13. CHAIN Option  . . . . . . . . . . . . . . . . . . . . . .   9
+     4.14. Edns-Key-Tag Option . . . . . . . . . . . . . . . . . . .   9
      4.15. Extended DNS Error Option . . . . . . . . . . . . . . . .   9
    5.  Examples of EDNS(0) Presentation Format . . . . . . . . . . .   9
    6.  Version-independent JSON representation . . . . . . . . . . .  10
-   7.  EDNS(0) Representation in JSON  . . . . . . . . . . . . . . .  10
+   7.  EDNS(0) Representation in JSON  . . . . . . . . . . . . . . .  11
      7.1.  Flags . . . . . . . . . . . . . . . . . . . . . . . . . .  11
      7.2.  Extended RCODE  . . . . . . . . . . . . . . . . . . . . .  11
      7.3.  UDP Payload Size  . . . . . . . . . . . . . . . . . . . .  11
      7.4.  Unrecognized Option . . . . . . . . . . . . . . . . . . .  11
-     7.5.  LLQ Option  . . . . . . . . . . . . . . . . . . . . . . .  11
+     7.5.  LLQ Option  . . . . . . . . . . . . . . . . . . . . . . .  12
      7.6.  NSID Option . . . . . . . . . . . . . . . . . . . . . . .  12
      7.7.  DAU, DHU and N3U Options  . . . . . . . . . . . . . . . .  12
      7.8.  Edns-Client-Subnet Option . . . . . . . . . . . . . . . .  12
      7.9.  EDNS EXPIRE Option  . . . . . . . . . . . . . . . . . . .  13
      7.10. Cookie Option . . . . . . . . . . . . . . . . . . . . . .  13
      7.11. Edns-Tcp-Keepalive Option . . . . . . . . . . . . . . . .  13
-     7.12. Padding Option  . . . . . . . . . . . . . . . . . . . . .  13
-     7.13. CHAIN Option  . . . . . . . . . . . . . . . . . . . . . .  13
-     7.14. Edns-Key-Tag Option . . . . . . . . . . . . . . . . . . .  13
+     7.12. Padding Option  . . . . . . . . . . . . . . . . . . . . .  14
+     7.13. CHAIN Option  . . . . . . . . . . . . . . . . . . . . . .  14
+     7.14. Edns-Key-Tag Option . . . . . . . . . . . . . . . . . . .  14
      7.15. Extended DNS Error Option . . . . . . . . . . . . . . . .  14
    8.  Examples of EDNS(0) Representation in JSON  . . . . . . . . .  14
-   9.  Update Representing DNS Messages in JSON  . . . . . . . . . .  14
-   10. Security Considerations . . . . . . . . . . . . . . . . . . .  15
-   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
-   12. Implementation Status . . . . . . . . . . . . . . . . . . . .  15
-   13. Change History  . . . . . . . . . . . . . . . . . . . . . . .  16
-   14. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
-     14.1.  Normative References . . . . . . . . . . . . . . . . . .  16
-     14.2.  Informative References . . . . . . . . . . . . . . . . .  18
+   9.  Update Representing DNS Messages in JSON  . . . . . . . . . .  15
+   10. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
+   11. Security Considerations . . . . . . . . . . . . . . . . . . .  16
+   12. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
+   13. Implementation Status . . . . . . . . . . . . . . . . . . . .  16
+   14. Change History  . . . . . . . . . . . . . . . . . . . . . . .  16
+   15. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+     15.1.  Normative References . . . . . . . . . . . . . . . . . .  16
 
 
 
-Peltan & Carpay            Expires 15 May 2023                  [Page 2]
+Peltan & Carpay            Expires 27 May 2023                  [Page 2]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
 
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  18
+     15.2.  Informative References . . . . . . . . . . . . . . . . .  18
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
 
 1.  Introduction
 
@@ -164,8 +165,7 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
 
 
-
-Peltan & Carpay            Expires 15 May 2023                  [Page 3]
+Peltan & Carpay            Expires 27 May 2023                  [Page 3]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
@@ -221,7 +221,7 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
 
 
-Peltan & Carpay            Expires 15 May 2023                  [Page 4]
+Peltan & Carpay            Expires 27 May 2023                  [Page 4]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
@@ -277,7 +277,7 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
 
 
-Peltan & Carpay            Expires 15 May 2023                  [Page 5]
+Peltan & Carpay            Expires 27 May 2023                  [Page 5]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
@@ -333,7 +333,7 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
 
 
-Peltan & Carpay            Expires 15 May 2023                  [Page 6]
+Peltan & Carpay            Expires 27 May 2023                  [Page 6]
 
 Internet-Draft      edns-presentation-and-json-format      November 2022
 
@@ -368,31 +368,42 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [RFC6975])
    Field-names are DAU, DHU, and N3U, respectively, and their Field-
    values consist of comma-separated lists of ALG-CODEs as Decimal
-   values.
+   values or the textual representations of the ALG-CODEs (called
+   mnemonic in the referenced documents) found in their respective IANA
+   registries [IANA.EDNS.DAU][IANA.EDNS.DHU][IANA.EDNS.N3U].
 
-   Example:
+   Examples:
+
+   DAU=RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
+   DHU=SHA-1,SHA-256,SHA-384
+   N3U=SHA-1
 
    DAU=8,10,13,14,15
    DHU=1,2,4
    N3U=1
+
+
+
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                  [Page 7]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
 
 4.8.  Edns-Client-Subnet Option
 
    The EDNS Client Subnet (OPTION-CODE 8 [RFC7871]) Field-name is ECS
    and if FAMILY is neither IPv4 (1) nor IPv6 (2), its Field-value is
    the whole OPTION-VALUE as Base16.  Otherwise, it consists of the
-   textual IPv4 or IPv6 address ([RFC1035], Section 3.4.1, [RFC2373],
+   textual IPv4 or IPv6 address ([RFC1035], Section 3.4.1, [RFC4291],
    Section 2.2), followed by a slash (/), followed by SOURCE PREFIX-
    LENGTH as Decimal value, followed by another slash, followed by SCOPE
    PREFIX-LENGTH as Decimal value.  If SCOPE PREFIX-LENGTH is zero, it
    MUST be omitted together with the second slash.
-
-
-
-Peltan & Carpay            Expires 15 May 2023                  [Page 7]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
    Examples:
 
@@ -417,7 +428,9 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 4.11.  Edns-Tcp-Keepalive Option
 
    The edns-tcp-keepalive (OPTION-CODE 11 [RFC7828]) Field-name is
-   KEEPALIVE and its Field-value is displayed as Decimal value.
+   KEEPALIVE and its Field-value is the TIMEOUT in seconds displayed as
+   decimal number with exactly one decimal digit and a dot as decimal
+   separator.
 
 4.12.  Padding Option
 
@@ -426,6 +439,16 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    VALUE consists only of zero-octets, it SHOULD be substituted with an
    alternative Field-value [###], where ### stands for OPTION-LENGTH as
    Decimal value.
+
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                  [Page 8]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
 
 4.13.  CHAIN Option
 
@@ -438,17 +461,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    The edns-key-tag (OPTION-CODE 14 [RFC8145], Section 4) Field-name is
    KEYTAG and its Field-value is displayed as a comma-separated list of
    Decimal values.
-
-
-
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                  [Page 8]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
 4.15.  Extended DNS Error Option
 
@@ -481,6 +493,19 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    Presentation format described above.  They may not make really sense
    and should not appear in normal DNS operation.
 
+
+
+
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                  [Page 9]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    . 0 IN EDNS0 (
        FLAGS=DO
        RCODE=BADCOOKIE
@@ -495,16 +520,8 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    . 0 IN EDNS0 ( FLAGS=0 RCODE=BADSIG UDPSIZE=4096 EXPIRE
                   NSID=6578616d706c652e636f6d2e ; example.com.
-                  DAU=8,10 KEEPALIVE=600 CHAIN=zerobyte\000.com.
+                  DAU=8,10 KEEPALIVE=60.0 CHAIN=zerobyte\000.com.
                   KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                  [Page 9]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
 6.  Version-independent JSON representation
 
@@ -536,6 +553,15 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    Example:
 
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 10]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    "EDNS": {
        "NAME": ".",
        "TTL": 16859136,
@@ -554,14 +580,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    respective EDNS Option.  If it is not, a generic name and value from
    Section 7.4 applies.  However, those generics MAY be used for any
    Option at all times.  Note that the order of members is not preserved
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 10]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
-
    in JSON.
 
 7.1.  Flags
@@ -590,6 +608,16 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    be displayed according this subsection.  Other options (specified
    below or otherwise) MAY be displayed so as well.
 
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 11]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    Unrecognized option JSON member name is OPT##, where ## stands for
    its OPTION-CODE as Decimal value, and its value is a String
    containing its OPTION-VALUE encoded as Base16.
@@ -606,17 +634,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    "LLQ": { "LLQ-VERSION": 1, "LLQ-OPCODE": 1, "LLQ-ERROR": 0,
             "LLQ-ID": 0, "LLQ-LEASE": 3600 }
-
-
-
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 11]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
 7.6.  NSID Option
 
@@ -648,8 +665,17 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    *  FAMILY - Integer with FAMILY
 
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 12]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    *  IP - String with the textual IPv4 or IPv6 address ([RFC1035],
-      Section 3.4.1, [RFC2373], Section 2.2), or a String with ADDRESS
+      Section 3.4.1, [RFC4291], Section 2.2), or a String with ADDRESS
       encoded as Base16 if FAMILY is neither 1 or 2
 
    *  SOURCE - Integer with SOURCE PREFIX-LENGTH
@@ -663,16 +689,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
        "IP": "1.2.3.4",
        "SOURCE": 24
    }
-
-
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 12]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
    "ECS": {
        "FAMILY": 2,
@@ -702,7 +718,17 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 7.11.  Edns-Tcp-Keepalive Option
 
    The edns-tcp-keepalive (OPTION-CODE 11 [RFC7828]) JSON member name is
-   KEEPALIVE and its value is an Integer.
+   KEEPALIVE and its value is the TIMEOUT in seconds formatted as a
+   Number [RFC8259], Section 6 (possibly a non-Integer).
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 13]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
 
 7.12.  Padding Option
 
@@ -720,15 +746,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    The edns-key-tag (OPTION-CODE 14 [RFC8145], Section 4) JSON member
    name is KEYTAG and its value is an Array of Integers.
-
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 13]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
 7.15.  Extended DNS Error Option
 
@@ -752,6 +769,23 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    in Section 5.  They may not make really sense and should not appear
    in normal DNS operation.
 
+
+
+
+
+
+
+
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 14]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    "EDNS0": {
        "FLAGS": [ "DO" ],
        "RCODE": "BADCOOKIE",
@@ -767,24 +801,17 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
        "PADDING": "[113]"
    }
 
-  "EDNS0": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
-             "EXPIRE": null, "NSIDHEX": "6578616d706c652e636f6d2e",
-             "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 600,
-             "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
-             "PADDING": "df24d08b0258c7de" }
+ "EDNS0": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
+            "EXPIRE": null, "NSIDHEX": "6578616d706c652e636f6d2e",
+            "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 60.0,
+            "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
+            "PADDING": "df24d08b0258c7de" }
 
 9.  Update Representing DNS Messages in JSON
 
    This section is not related to EDNS.  This section updates [RFC8427],
    Section 2.6, including erratum 5439, which introduced contradicting
    MUSTs for escaping of backslashes.
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 14]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
    In order to solve this contradiction and correctly represent a DNS
    name in JSON, it MUST be first converted to textual Presentation
@@ -808,6 +835,13 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    Internationalized Domain Name (IDN) labels MUST be expressed in their
    A-label form, as described in [RFC5890].
 
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 15]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
    Example: the name with the Wire format 04005C2E2203646F6D00 can be
    represented in JSON as:
 
@@ -817,32 +851,26 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
    "NAME": "\\000\\092\\.\\\".c\\om."
 
-10.  Security Considerations
+10.  IANA Considerations
 
    None.
 
-11.  Acknowledgements
+11.  Security Considerations
+
+   None.
+
+12.  Acknowledgements
 
    TODO
 
-12.  Implementation Status
+13.  Implementation Status
 
    *Note to the RFC Editor*: please remove this entire appendix before
    publication.
 
    None yet.
 
-
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 15]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
-
-13.  Change History
+14.  Change History
 
    *Note to the RFC Editor*: please remove this entire appendix before
    publication.
@@ -851,17 +879,24 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
 
       Initial public draft.
 
-14.  References
+15.  References
 
-14.1.  Normative References
-
-   [RFC8427]  Hoffman, P., "Representing DNS Messages in JSON",
-              RFC 8427, DOI 10.17487/RFC8427, July 2018,
-              <https://www.rfc-editor.org/info/rfc8427>.
+15.1.  Normative References
 
    [RFC1035]  Mockapetris, P., "Domain names - implementation and
               specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
               November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 16]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
 
    [RFC6891]  Damas, J., Graff, M., and P. Vixie, "Extension Mechanisms
               for DNS (EDNS(0))", STD 75, RFC 6891,
@@ -872,6 +907,10 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
               Interchange Format", STD 90, RFC 8259,
               DOI 10.17487/RFC8259, December 2017,
               <https://www.rfc-editor.org/info/rfc8259>.
+
+   [RFC8427]  Hoffman, P., "Representing DNS Messages in JSON",
+              RFC 8427, DOI 10.17487/RFC8427, July 2018,
+              <https://www.rfc-editor.org/info/rfc8427>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -889,14 +928,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
    [RFC3597]  Gustafsson, A., "Handling of Unknown DNS Resource Record
               (RR) Types", RFC 3597, DOI 10.17487/RFC3597, September
               2003, <https://www.rfc-editor.org/info/rfc3597>.
-
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 16]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
 
    [RFC8764]  Cheshire, S. and M. Krochmal, "Apple's DNS Long-Lived
               Queries Protocol", RFC 8764, DOI 10.17487/RFC8764, June
@@ -916,9 +947,16 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
               DOI 10.17487/RFC7871, May 2016,
               <https://www.rfc-editor.org/info/rfc7871>.
 
-   [RFC2373]  Hinden, R. and S. Deering, "IP Version 6 Addressing
-              Architecture", RFC 2373, DOI 10.17487/RFC2373, July 1998,
-              <https://www.rfc-editor.org/info/rfc2373>.
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 17]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
+
+   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+              2006, <https://www.rfc-editor.org/info/rfc4291>.
 
    [RFC7314]  Andrews, M., "Extension Mechanisms for DNS (EDNS) EXPIRE
               Option", RFC 7314, DOI 10.17487/RFC7314, July 2014,
@@ -946,14 +984,6 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
               RFC 8145, DOI 10.17487/RFC8145, April 2017,
               <https://www.rfc-editor.org/info/rfc8145>.
 
-
-
-
-Peltan & Carpay            Expires 15 May 2023                 [Page 17]
-
-Internet-Draft      edns-presentation-and-json-format      November 2022
-
-
    [RFC8914]  Kumari, W., Hunt, E., Arends, R., Hardaker, W., and D.
               Lawrence, "Extended DNS Errors", RFC 8914,
               DOI 10.17487/RFC8914, October 2020,
@@ -964,12 +994,21 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
               RFC 5890, DOI 10.17487/RFC5890, August 2010,
               <https://www.rfc-editor.org/info/rfc5890>.
 
-14.2.  Informative References
+15.2.  Informative References
 
    [IANA.EDNS.Flags]
               "EDNS Header Flags", n.d.,
               <https://www.iana.org/assignments/dns-parameters/dns-
               parameters.xhtml#dns-parameters-13>.
+
+
+
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 18]
+
+Internet-Draft      edns-presentation-and-json-format      November 2022
+
 
    [IANA.RCODEs]
               "DNS RCODEs", n.d., <https://www.iana.org/assignments/dns-
@@ -979,6 +1018,21 @@ Internet-Draft      edns-presentation-and-json-format      November 2022
               "EDNS Extended Error Codes", n.d.,
               <https://www.iana.org/assignments/dns-parameters/dns-
               parameters.xhtml#extended-dns-error-codes>.
+
+   [IANA.EDNS.DAU]
+              "DNS Security Algorithm Numbers", n.d.,
+              <https://www.iana.org/assignments/dns-sec-alg-numbers/dns-
+              sec-alg-numbers.xhtml>.
+
+   [IANA.EDNS.DHU]
+              "DNSSEC DS RR Type Digest Algorithms", n.d.,
+              <https://www.iana.org/assignments/ds-rr-types/ds-rr-
+              types.xhtml#ds-rr-types-1>.
+
+   [IANA.EDNS.N3U]
+              "DNSSEC NSEC3 Hash Algorithms", n.d.,
+              <https://www.iana.org/assignments/dnssec-nsec3-parameters/
+              dnssec-nsec3-parameters.xhtml#dnssec-nsec3-parameters-3>.
 
 Authors' Addresses
 
@@ -1005,4 +1059,6 @@ Authors' Addresses
 
 
 
-Peltan & Carpay            Expires 15 May 2023                 [Page 18]
+
+
+Peltan & Carpay            Expires 27 May 2023                 [Page 19]

@@ -9,7 +9,7 @@
 <meta content="Tom Carpay" name="author">
 <meta content="
        This document describes textual and JSON representation format of EDNS option.
-It also modifies the escaping rules of JSON representation of DNS messages, previously defined in  . 
+It also modifies the escaping rules of JSON representation of DNS messages, previously defined in RFC8427. 
     " name="description">
 <meta content="xml2rfc 3.12.2" name="generator">
 <meta content="Internet-Draft" name="keyword">
@@ -1178,7 +1178,7 @@ li > p:last-of-type {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Peltan &amp; Carpay</td>
-<td class="center">Expires 15 May 2023</td>
+<td class="center">Expires 27 May 2023</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1194,12 +1194,12 @@ li > p:last-of-type {
 <a href="https://www.rfc-editor.org/rfc/rfc8427" class="eref">8427</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2022-11-11" class="published">11 November 2022</time>
+<time datetime="2022-11-23" class="published">23 November 2022</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2023-05-15">15 May 2023</time></dd>
+<dd class="expires"><time datetime="2023-05-27">27 May 2023</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1217,7 +1217,7 @@ li > p:last-of-type {
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
 <p id="section-abstract-1">This document describes textual and JSON representation format of EDNS option.
-It also modifies the escaping rules of JSON representation of DNS messages, previously defined in <span>[<a href="#RFC8427" class="xref">RFC8427</a>]</span>.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+It also modifies the escaping rules of JSON representation of DNS messages, previously defined in RFC8427.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1238,7 +1238,7 @@ It also modifies the escaping rules of JSON representation of DNS messages, prev
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 15 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 27 May 2023.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1389,30 +1389,33 @@ It also modifies the escaping rules of JSON representation of DNS messages, prev
             <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-update-representing-dns-mes" class="xref">Update Representing DNS Messages in JSON</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a href="#name-acknowledgements" class="xref">Acknowledgements</a></p>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="xref">12</a>. <a href="#name-implementation-status" class="xref">Implementation Status</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="xref">12</a>. <a href="#name-acknowledgements" class="xref">Acknowledgements</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="xref">13</a>. <a href="#name-change-history" class="xref">Change History</a></p>
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="xref">13</a>. <a href="#name-implementation-status" class="xref">Implementation Status</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#section-14" class="xref">14</a>. <a href="#name-references" class="xref">References</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="xref">14.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="xref">14</a>. <a href="#name-change-history" class="xref">Change History</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="xref">14.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="xref">15</a>. <a href="#name-references" class="xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="xref">15.1</a>.  <a href="#name-normative-references" class="xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
+                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="xref">15.2</a>.  <a href="#name-informative-references" class="xref">Informative References</a></p>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1636,14 +1639,21 @@ LLQ=1,LLQ-SETUP,NO-ERROR,0,3600
         <h3 id="name-dau-dhu-and-n3u-options">
 <a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-dau-dhu-and-n3u-options" class="section-name selfRef">DAU, DHU and N3U Options</a>
         </h3>
-<p id="section-4.7-1">The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively <span>[<a href="#RFC6975" class="xref">RFC6975</a>]</span>) Field-names are <code>DAU</code>, <code>DHU</code>, and <code>N3U</code>, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
-<p id="section-4.7-2">Example:<a href="#section-4.7-2" class="pilcrow">¶</a></p>
+<p id="section-4.7-1">The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively <span>[<a href="#RFC6975" class="xref">RFC6975</a>]</span>) Field-names are <code>DAU</code>, <code>DHU</code>, and <code>N3U</code>, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries <span>[<a href="#IANA.EDNS.DAU" class="xref">IANA.EDNS.DAU</a>]</span><span>[<a href="#IANA.EDNS.DHU" class="xref">IANA.EDNS.DHU</a>]</span><span>[<a href="#IANA.EDNS.N3U" class="xref">IANA.EDNS.N3U</a>]</span>.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
+<p id="section-4.7-2">Examples:<a href="#section-4.7-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.7-3">
+<pre>
+DAU=RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
+DHU=SHA-1,SHA-256,SHA-384
+N3U=SHA-1
+</pre><a href="#section-4.7-3" class="pilcrow">¶</a>
+</div>
+<div class="alignLeft art-text artwork" id="section-4.7-4">
 <pre>
 DAU=8,10,13,14,15
 DHU=1,2,4
 N3U=1
-</pre><a href="#section-4.7-3" class="pilcrow">¶</a>
+</pre><a href="#section-4.7-4" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -1653,7 +1663,7 @@ N3U=1
 <a href="#section-4.8" class="section-number selfRef">4.8. </a><a href="#name-edns-client-subnet-option" class="section-name selfRef">Edns-Client-Subnet Option</a>
         </h3>
 <p id="section-4.8-1">The EDNS Client Subnet (OPTION-CODE 8 <span>[<a href="#RFC7871" class="xref">RFC7871</a>]</span>) Field-name is <code>ECS</code> and if FAMILY is neither IPv4 (<code>1</code>) nor IPv6 (<code>2</code>), its Field-value is the whole OPTION-VALUE as Base16.
-Otherwise, it consists of the textual IPv4 or IPv6 address (<span>[<a href="#RFC1035" class="xref">RFC1035</a>], <a href="https://rfc-editor.org/rfc/rfc1035#section-3.4.1" class="relref">Section 3.4.1</a></span>, <span>[<a href="#RFC2373" class="xref">RFC2373</a>], <a href="https://rfc-editor.org/rfc/rfc2373#section-2.2" class="relref">Section 2.2</a></span>), followed by a slash (<code>/</code>), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
+Otherwise, it consists of the textual IPv4 or IPv6 address (<span>[<a href="#RFC1035" class="xref">RFC1035</a>], <a href="https://rfc-editor.org/rfc/rfc1035#section-3.4.1" class="relref">Section 3.4.1</a></span>, <span>[<a href="#RFC4291" class="xref">RFC4291</a>], <a href="https://rfc-editor.org/rfc/rfc4291#section-2.2" class="relref">Section 2.2</a></span>), followed by a slash (<code>/</code>), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
 If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.<a href="#section-4.8-1" class="pilcrow">¶</a></p>
 <p id="section-4.8-2">Examples:<a href="#section-4.8-2" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-4.8-3">
@@ -1695,7 +1705,7 @@ The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 
         <h3 id="name-edns-tcp-keepalive-option">
 <a href="#section-4.11" class="section-number selfRef">4.11. </a><a href="#name-edns-tcp-keepalive-option" class="section-name selfRef">Edns-Tcp-Keepalive Option</a>
         </h3>
-<p id="section-4.11-1">The edns-tcp-keepalive (OPTION-CODE 11 <span>[<a href="#RFC7828" class="xref">RFC7828</a>]</span>) Field-name is <code>KEEPALIVE</code> and its Field-value is displayed as Decimal value.<a href="#section-4.11-1" class="pilcrow">¶</a></p>
+<p id="section-4.11-1">The edns-tcp-keepalive (OPTION-CODE 11 <span>[<a href="#RFC7828" class="xref">RFC7828</a>]</span>) Field-name is <code>KEEPALIVE</code> and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.<a href="#section-4.11-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="padding">
@@ -1775,7 +1785,7 @@ They may not make really sense and should not appear in normal DNS operation.<a 
 <pre>
 . 0 IN EDNS0 ( FLAGS=0 RCODE=BADSIG UDPSIZE=4096 EXPIRE
                NSID=6578616d706c652e636f6d2e ; example.com.
-               DAU=8,10 KEEPALIVE=600 CHAIN=zerobyte\000.com.
+               DAU=8,10 KEEPALIVE=60.0 CHAIN=zerobyte\000.com.
                KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
 </pre><a href="#section-5-3" class="pilcrow">¶</a>
 </div>
@@ -1926,7 +1936,7 @@ Note that in that case, JSON escaping routines (<span>[<a href="#RFC8259" class=
             <code>FAMILY</code> - Integer with FAMILY<a href="#section-7.8-2.1" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.8-2.2">
-            <code>IP</code> - String with the textual IPv4 or IPv6 address (<span>[<a href="#RFC1035" class="xref">RFC1035</a>], <a href="https://rfc-editor.org/rfc/rfc1035#section-3.4.1" class="relref">Section 3.4.1</a></span>, <span>[<a href="#RFC2373" class="xref">RFC2373</a>], <a href="https://rfc-editor.org/rfc/rfc2373#section-2.2" class="relref">Section 2.2</a></span>), or a String with ADDRESS encoded as Base16 if FAMILY is neither <code>1</code> or <code>2</code><a href="#section-7.8-2.2" class="pilcrow">¶</a>
+            <code>IP</code> - String with the textual IPv4 or IPv6 address (<span>[<a href="#RFC1035" class="xref">RFC1035</a>], <a href="https://rfc-editor.org/rfc/rfc1035#section-3.4.1" class="relref">Section 3.4.1</a></span>, <span>[<a href="#RFC4291" class="xref">RFC4291</a>], <a href="https://rfc-editor.org/rfc/rfc4291#section-2.2" class="relref">Section 2.2</a></span>), or a String with ADDRESS encoded as Base16 if FAMILY is neither <code>1</code> or <code>2</code><a href="#section-7.8-2.2" class="pilcrow">¶</a>
 </li>
           <li class="normal" id="section-7.8-2.3">
             <code>SOURCE</code> - Integer with SOURCE PREFIX-LENGTH<a href="#section-7.8-2.3" class="pilcrow">¶</a>
@@ -1987,7 +1997,7 @@ Note that in that case, JSON escaping routines (<span>[<a href="#RFC8259" class=
         <h3 id="name-edns-tcp-keepalive-option-2">
 <a href="#section-7.11" class="section-number selfRef">7.11. </a><a href="#name-edns-tcp-keepalive-option-2" class="section-name selfRef">Edns-Tcp-Keepalive Option</a>
         </h3>
-<p id="section-7.11-1">The edns-tcp-keepalive (OPTION-CODE 11 <span>[<a href="#RFC7828" class="xref">RFC7828</a>]</span>) JSON member name is <code>KEEPALIVE</code> and its value is an Integer.<a href="#section-7.11-1" class="pilcrow">¶</a></p>
+<p id="section-7.11-1">The edns-tcp-keepalive (OPTION-CODE 11 <span>[<a href="#RFC7828" class="xref">RFC7828</a>]</span>) JSON member name is <code>KEEPALIVE</code> and its value is the TIMEOUT in seconds formatted as a Number <span>[<a href="#RFC8259" class="xref">RFC8259</a>], <a href="https://rfc-editor.org/rfc/rfc8259#section-6" class="relref">Section 6</a></span> (possibly a non-Integer).<a href="#section-7.11-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="padding-option">
@@ -2067,7 +2077,7 @@ They may not make really sense and should not appear in normal DNS operation.<a 
 <pre>
 "EDNS0": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
            "EXPIRE": null, "NSIDHEX": "6578616d706c652e636f6d2e",
-           "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 600,
+           "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 60.0,
            "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
            "PADDING": "df24d08b0258c7de" }
 </pre><a href="#section-8-3" class="pilcrow">¶</a>
@@ -2103,61 +2113,65 @@ Internationalized Domain Name (IDN) labels MUST be expressed in their A-label fo
 </div>
 </section>
 </div>
-<div id="security">
+<div id="iana">
 <section id="section-10">
-      <h2 id="name-security-considerations">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      <h2 id="name-iana-considerations">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
 <p id="section-10-1">None.<a href="#section-10-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="acknowledgements">
+<div id="security">
 <section id="section-11">
-      <h2 id="name-acknowledgements">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      <h2 id="name-security-considerations">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-11-1">TODO<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-1">None.<a href="#section-11-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="acknowledgements">
+<section id="section-12">
+      <h2 id="name-acknowledgements">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+      </h2>
+<p id="section-12-1">TODO<a href="#section-12-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="implementation-status">
-<section id="section-12">
+<section id="section-13">
       <h2 id="name-implementation-status">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
       </h2>
-<p id="section-12-1"><strong>Note to the RFC Editor</strong>: please remove this entire appendix before publication.<a href="#section-12-1" class="pilcrow">¶</a></p>
-<p id="section-12-2">None yet.<a href="#section-12-2" class="pilcrow">¶</a></p>
+<p id="section-13-1"><strong>Note to the RFC Editor</strong>: please remove this entire appendix before publication.<a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-13-2">None yet.<a href="#section-13-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="change-history">
-<section id="section-13">
+<section id="section-14">
       <h2 id="name-change-history">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-change-history" class="section-name selfRef">Change History</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-change-history" class="section-name selfRef">Change History</a>
       </h2>
-<p id="section-13-1"><strong>Note to the RFC Editor</strong>: please remove this entire appendix before publication.<a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-14-1"><strong>Note to the RFC Editor</strong>: please remove this entire appendix before publication.<a href="#section-14-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13-2.1">edns-presentation-format-00<a href="#section-13-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-14-2.1">edns-presentation-format-00<a href="#section-14-2.1" class="pilcrow">¶</a>
 </li>
       </ul>
 <ul class="normal ulEmpty">
-<li class="normal ulEmpty" id="section-13-3.1">
-          <p id="section-13-3.1.1">Initial public draft.<a href="#section-13-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal ulEmpty" id="section-14-3.1">
+          <p id="section-14-3.1.1">Initial public draft.<a href="#section-14-3.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
 </div>
-<section id="section-14">
+<section id="section-15">
       <h2 id="name-references">
-<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
-<section id="section-14.1">
+<section id="section-15.1">
         <h3 id="name-normative-references">
-<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
-<dt id="RFC8427">[RFC8427]</dt>
-        <dd>
-<span class="refAuthor">Hoffman, P.</span>, <span class="refTitle">"Representing DNS Messages in JSON"</span>, <span class="seriesInfo">RFC 8427</span>, <span class="seriesInfo">DOI 10.17487/RFC8427</span>, <time datetime="2018-07" class="refDate">July 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8427">https://www.rfc-editor.org/info/rfc8427</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="RFC1035">[RFC1035]</dt>
         <dd>
 <span class="refAuthor">Mockapetris, P.</span>, <span class="refTitle">"Domain names - implementation and specification"</span>, <span class="seriesInfo">STD 13</span>, <span class="seriesInfo">RFC 1035</span>, <span class="seriesInfo">DOI 10.17487/RFC1035</span>, <time datetime="1987-11" class="refDate">November 1987</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc1035">https://www.rfc-editor.org/info/rfc1035</a>&gt;</span>. </dd>
@@ -2169,6 +2183,10 @@ Internationalized Domain Name (IDN) labels MUST be expressed in their A-label fo
 <dt id="RFC8259">[RFC8259]</dt>
         <dd>
 <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8259">https://www.rfc-editor.org/info/rfc8259</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8427">[RFC8427]</dt>
+        <dd>
+<span class="refAuthor">Hoffman, P.</span>, <span class="refTitle">"Representing DNS Messages in JSON"</span>, <span class="seriesInfo">RFC 8427</span>, <span class="seriesInfo">DOI 10.17487/RFC8427</span>, <time datetime="2018-07" class="refDate">July 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8427">https://www.rfc-editor.org/info/rfc8427</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -2202,9 +2220,9 @@ Internationalized Domain Name (IDN) labels MUST be expressed in their A-label fo
         <dd>
 <span class="refAuthor">Contavalli, C.</span>, <span class="refAuthor">van der Gaast, W.</span>, <span class="refAuthor">Lawrence, D.</span>, and <span class="refAuthor">W. Kumari</span>, <span class="refTitle">"Client Subnet in DNS Queries"</span>, <span class="seriesInfo">RFC 7871</span>, <span class="seriesInfo">DOI 10.17487/RFC7871</span>, <time datetime="2016-05" class="refDate">May 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7871">https://www.rfc-editor.org/info/rfc7871</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC2373">[RFC2373]</dt>
+<dt id="RFC4291">[RFC4291]</dt>
         <dd>
-<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 2373</span>, <span class="seriesInfo">DOI 10.17487/RFC2373</span>, <time datetime="1998-07" class="refDate">July 1998</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2373">https://www.rfc-editor.org/info/rfc2373</a>&gt;</span>. </dd>
+<span class="refAuthor">Hinden, R.</span> and <span class="refAuthor">S. Deering</span>, <span class="refTitle">"IP Version 6 Addressing Architecture"</span>, <span class="seriesInfo">RFC 4291</span>, <span class="seriesInfo">DOI 10.17487/RFC4291</span>, <time datetime="2006-02" class="refDate">February 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4291">https://www.rfc-editor.org/info/rfc4291</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7314">[RFC7314]</dt>
         <dd>
@@ -2240,9 +2258,9 @@ Internationalized Domain Name (IDN) labels MUST be expressed in their A-label fo
 <dd class="break"></dd>
 </dl>
 </section>
-<section id="section-14.2">
+<section id="section-15.2">
         <h3 id="name-informative-references">
-<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="IANA.EDNS.Flags">[IANA.EDNS.Flags]</dt>
@@ -2254,8 +2272,20 @@ Internationalized Domain Name (IDN) labels MUST be expressed in their A-label fo
 <span class="refTitle">"DNS RCODEs"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6">https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="IANA.EDNS.EDE">[IANA.EDNS.EDE]</dt>
-      <dd>
+        <dd>
 <span class="refTitle">"EDNS Extended Error Codes"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#extended-dns-error-codes">https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#extended-dns-error-codes</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA.EDNS.DAU">[IANA.EDNS.DAU]</dt>
+        <dd>
+<span class="refTitle">"DNS Security Algorithm Numbers"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml">https://www.iana.org/assignments/dns-sec-alg-numbers/dns-sec-alg-numbers.xhtml</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA.EDNS.DHU">[IANA.EDNS.DHU]</dt>
+        <dd>
+<span class="refTitle">"DNSSEC DS RR Type Digest Algorithms"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml#ds-rr-types-1">https://www.iana.org/assignments/ds-rr-types/ds-rr-types.xhtml#ds-rr-types-1</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="IANA.EDNS.N3U">[IANA.EDNS.N3U]</dt>
+      <dd>
+<span class="refTitle">"DNSSEC NSEC3 Hash Algorithms"</span>, <span>n.d.</span>, <span>&lt;<a href="https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml#dnssec-nsec3-parameters-3">https://www.iana.org/assignments/dnssec-nsec3-parameters/dnssec-nsec3-parameters.xhtml#dnssec-nsec3-parameters-3</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
