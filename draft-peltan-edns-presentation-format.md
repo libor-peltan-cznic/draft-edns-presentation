@@ -228,7 +228,7 @@ The NSID (OPTION-CODE 3 {{!RFC5001}}) Field-name is `NSID` and Field-value is it
 
 It is recommended to add a comment with ASCII representation of the value.
 
-## DAU, DHU and N3U Options
+## DAU, DHU and N3U Options {#dau}
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
 
@@ -272,7 +272,7 @@ The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Fiel
 The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) Field-name is `COOKIE` and its Field-value consists of the Client Cookie as Base16, followed by a comma, followed by the Server Cookie as Base16.
 The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 8.
 
-## Edns-Tcp-Keepalive Option
+## Edns-Tcp-Keepalive Option {#keepalive}
 
 The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.
 
@@ -289,7 +289,7 @@ The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-valu
 
 The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
 
-## Extended DNS Error Option
+## Extended DNS Error Option {#ede}
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
 It is recommended to add a comment with the Purpose of the given code (first presented in {{!RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
@@ -418,7 +418,7 @@ The NSID (OPTION-CODE 3 {{!RFC5001}}) JSON member name is `NSIDHEX` and its valu
 Optionally, one more member of `EDNS0` Object MAY be added as well, with the name `NSID` and the value being a String with the OPTION-VALUE interpreted as UTF-8.
 Note that in that case, JSON escaping routines ({{!RFC8259, Section 7}}) take place, possibly using the `\uXXXX` notation.
 
-## DAU, DHU and N3U Options
+## DAU, DHU and N3U Options {#jdau}
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
 
@@ -472,7 +472,7 @@ The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) JSON member name is `EXPIRE` and it
 
 The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) JSON member name is `COOKIE` and its value is an Array containing a String with the Client Cookie encoded as Base16 and, if present, another String with Server Cookie encoded as Base16.
 
-## Edns-Tcp-Keepalive Option
+## Edns-Tcp-Keepalive Option {#jkeepalive}
 
 The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is the TIMEOUT in seconds formatted as a Number {{!RFC8259, Section 6}} (possibly a non-Integer).
 
@@ -489,7 +489,7 @@ See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
 
 The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) JSON member name is `KEYTAG` and its value is an Array of Integers.
 
-## Extended DNS Error Option
+## Extended DNS Error Option {#jede}
 
 The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
 
@@ -528,6 +528,21 @@ They may not make really sense and should not appear in normal DNS operation.
            "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
            "PADDING": "df24d08b0258c7de" }
 ~~~
+
+# Guidelines for Future EDNS(0) Options
+
+This draft describes the presentation and JSON format of those ENDS(0) options, which are known at the time of writing.
+Other EDNS(0) options fall in the category of Unrecognized Options ([unrecognized](#unrecognized), [junrecognized](#junrecognized)), unless their specifications define their presentation and JSON formats explicitly.
+Following guidelines shall help defining them.
+
+It is recommended to specify the presentation and JSON formats in every document defining new ENDS(0) options.
+Those formats should follow the options' values semantics rather than syntax, in order to make them more human-readable.
+This includes displaying enumerations' values in their text form rather than numeric (see how DAU option is treated [dau](#dau), [jdau](#jdau)), converting numeric amounts to comprehensible units (see Edns-Tcp-Keepalive Option [keepalive](#keepalive), [jkeepalive](#jkeepalive)) and adding explanatory comments if useful (see Extended DNS Error [ede](#ede), [jede](#jede)).
+
+The formats MUST be defined in a way that the reverse process of conversion back to wire format is possible and unambiguous, with the exception that JSON is not able to preserve the order of members within objects.
+When a string is ripped from the wire format, escaping rules for special characters MUST be considered.
+Treating malformed wire format MUST be taken into consideration when defining the presentation and JSON format, but a simple fallback to Unrecognized Option format is a viable treatment.
+See the above-defined presentation and JSON formats of existing EDNS(0) options for inspiration, analogies and tricks.
 
 # Update Representing DNS Messages in JSON {#jsonescaping}
 
