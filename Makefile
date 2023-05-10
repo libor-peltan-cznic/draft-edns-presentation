@@ -1,4 +1,4 @@
-VERSION = 00
+VERSION = 01
 DOCNAME = draft-peltan-edns-presentation-format
 
 all: $(DOCNAME)-$(VERSION).txt $(DOCNAME)-$(VERSION).html

@@ -574,11 +574,13 @@ but also as (among other ways):
 
 # IANA Considerations {#iana}
 
-None.
+This document has no IANA actions.
 
 # Security Considerations {#security}
 
-None.
+This document describes just textual representation of binary data, and therefore has no security impact on related protocols.
+
+When implementing software, care must be taken to handle ipossibly inconsistent or broken input data.
 
 # Acknowledgements
 
@@ -598,5 +600,8 @@ None yet.
 
 > Initial public draft.
 
+* edns-presentation-format-01
+
+> Added Guidelines for Future EDNS(0) Options, dummy IANA Considerations and Security Considerations.
 
 --- back
