@@ -21,7 +21,7 @@ author:
     ins: T. Carpay
     name: Tom Carpay
     org: NLnet Labs
-    email: tom@nlnetlabs.nl
+    email: tomcarpay@gmail.com
 
 informative:
   IANA.EDNS.Flags:
