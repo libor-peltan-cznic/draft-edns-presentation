@@ -580,7 +580,7 @@ This document has no IANA actions.
 
 This document describes just textual representation of binary data, and therefore has no security impact on related protocols.
 
-When implementing software, care must be taken to handle ipossibly inconsistent or broken input data.
+When implementing software, care must be taken to handle possibly inconsistent or broken input data.
 
 # Acknowledgements
 
