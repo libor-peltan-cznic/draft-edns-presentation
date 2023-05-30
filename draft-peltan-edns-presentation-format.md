@@ -4,7 +4,7 @@ abbrev: edns-presentation-and-json-format
 docname: @DOCNAME@
 date: {DATE}
 
-category: std
+category: info
 ipr: trust200902
 keyword: Internet-Draft
 stand_alone: yes
@@ -109,7 +109,7 @@ In specific:
 * Owner Name is the Owner Name of the OPT record.
 Note that this is always `.` (DNS Root Domain Name) unless malformed.
 
-* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{!RFC6891, Section 6.1.3}}.
+* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
 
 * CLASS is a text representation of the 16-bit integer at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
 This will usually result in `CLASS####` (where #### will be the Decimal value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
@@ -210,7 +210,7 @@ Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{!RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decimal values.
+The LLQ (OPTION-CODE 1 {{?RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decimal values.
 The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{!RFC8764, Section 3.1}}.
 
 Examples:
@@ -224,7 +224,7 @@ LLQ=1,LLQ-SETUP,NO-ERROR,0,3600
 
 ## NSID Option
 
-The NSID (OPTION-CODE 3 {{!RFC5001}}) Field-name is `NSID` and Field-value is its OPTION-VALUE displayed as Base16.
+The NSID (OPTION-CODE 3 {{?RFC5001}}) Field-name is `NSID` and Field-value is its OPTION-VALUE displayed as Base16.
 
 It is recommended to add a comment with ASCII representation of the value.
 
@@ -247,7 +247,7 @@ N3U=1
 
 ## Edns-Client-Subnet Option
 
-The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) Field-name is `ECS` and if FAMILY is neither IPv4 (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
+The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) Field-name is `ECS` and if FAMILY is neither IPv4 (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
 Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
 If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.
 
@@ -265,34 +265,34 @@ ECS=000520000102030405060708
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
+The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
 
 ## Cookie Option
 
-The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) Field-name is `COOKIE` and its Field-value consists of the Client Cookie as Base16, followed by a comma, followed by the Server Cookie as Base16.
+The DNS Cookie (OPTION-CODE 10 {{?RFC7873}}) Field-name is `COOKIE` and its Field-value consists of the Client Cookie as Base16, followed by a comma, followed by the Server Cookie as Base16.
 The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 8.
 
 ## Edns-Tcp-Keepalive Option {#keepalive}
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.
+The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.
 
 ## Padding Option {#padding}
 
-The Padding (OPTION-CODE 12 {{!RFC7830}}) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
+The Padding (OPTION-CODE 12 {{?RFC7830}}) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
 If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decimal value.
 
 ## CHAIN Option
 
-The CHAIN (OPTION-CODE 13 {{!RFC7901}}) Field-name is `CHAIN` and its Field-value, the Closest trust point, is displayed as a textual Fully-Qualified Domain Name.
+The CHAIN (OPTION-CODE 13 {{?RFC7901}}) Field-name is `CHAIN` and its Field-value, the Closest trust point, is displayed as a textual Fully-Qualified Domain Name.
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
+The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
 
 ## Extended DNS Error Option {#ede}
 
-The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
-It is recommended to add a comment with the Purpose of the given code (first presented in {{!RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
+The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
+It is recommended to add a comment with the Purpose of the given code (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
 
@@ -347,7 +347,7 @@ The OPT pseudorecord is in this case represented in JSON as on object called `ED
 Note that this is always `.` (DNS Root Domain Name) unless malformed.
 See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
 
-* `TTL` - Integer with the 32-bit big-endian value appearing at the TTL position of OPT pseudorecord Wire format, see {{!RFC6891, Section 6.1.3}}.
+* `TTL` - Integer with the 32-bit big-endian value appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
 
 * `CLASS` - Integer with the 16-bit value at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
 
@@ -401,7 +401,7 @@ Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTIO
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{!RFC8764}}) JSON member name is `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, and `LLQ-LEASE`, each representing the respective value as Integer.
+The LLQ (OPTION-CODE 1 {{?RFC8764}}) JSON member name is `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, and `LLQ-LEASE`, each representing the respective value as Integer.
 Note that only numeric representation of these values is possible.
 
 Example:
@@ -413,14 +413,14 @@ Example:
 
 ## NSID Option
 
-The NSID (OPTION-CODE 3 {{!RFC5001}}) JSON member name is `NSIDHEX` and its value is a String with OPTION-VALUE encoded as Base16.
+The NSID (OPTION-CODE 3 {{?RFC5001}}) JSON member name is `NSIDHEX` and its value is a String with OPTION-VALUE encoded as Base16.
 
 Optionally, one more member of `EDNS0` Object MAY be added as well, with the name `NSID` and the value being a String with the OPTION-VALUE interpreted as UTF-8.
 Note that in that case, JSON escaping routines ({{!RFC8259, Section 7}}) take place, possibly using the `\uXXXX` notation.
 
 ## DAU, DHU and N3U Options {#jdau}
 
-The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
+The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{?RFC6975}}) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
 
 Example:
 
@@ -432,7 +432,7 @@ Example:
 
 ## Edns-Client-Subnet Option
 
-The EDNS Client Subnet (OPTION-CODE 8 {{!RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
+The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
 
 * `FAMILY` - Integer with FAMILY
 * `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
@@ -466,32 +466,32 @@ Examples:
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{!RFC7314}}) JSON member name is `EXPIRE` and its value is either an Integer or `null`.
+The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) JSON member name is `EXPIRE` and its value is either an Integer or `null`.
 
 ## Cookie Option
 
-The DNS Cookie (OPTION-CODE 10 {{!RFC7873}}) JSON member name is `COOKIE` and its value is an Array containing a String with the Client Cookie encoded as Base16 and, if present, another String with Server Cookie encoded as Base16.
+The DNS Cookie (OPTION-CODE 10 {{?RFC7873}}) JSON member name is `COOKIE` and its value is an Array containing a String with the Client Cookie encoded as Base16 and, if present, another String with Server Cookie encoded as Base16.
 
 ## Edns-Tcp-Keepalive Option {#jkeepalive}
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{!RFC7828}}) JSON member name is `KEEPALIVE` and its value is the TIMEOUT in seconds formatted as a Number {{!RFC8259, Section 6}} (possibly a non-Integer).
+The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) JSON member name is `KEEPALIVE` and its value is the TIMEOUT in seconds formatted as a Number {{!RFC8259, Section 6}} (possibly a non-Integer).
 
 ## Padding Option
 
-The Padding (OPTION-CODE 12 {{!RFC7830}}) JSON member name is `PADDING` and its value is a String containing Field-value from [padding](#padding).
+The Padding (OPTION-CODE 12 {{?RFC7830}}) JSON member name is `PADDING` and its value is a String containing Field-value from [padding](#padding).
 
 ## CHAIN Option
 
-The CHAIN (OPTION-CODE 13 {{!RFC7901}}) JSON member name is `CHAIN` and its value is a String with the OPTION-VALUE in the form of a textual Fully-Qualified Domain Name.
+The CHAIN (OPTION-CODE 13 {{?RFC7901}}) JSON member name is `CHAIN` and its value is a String with the OPTION-VALUE in the form of a textual Fully-Qualified Domain Name.
 See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{!RFC8145, Section 4}}) JSON member name is `KEYTAG` and its value is an Array of Integers.
+The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) JSON member name is `KEYTAG` and its value is an Array of Integers.
 
 ## Extended DNS Error Option {#jede}
 
-The Extended DNS Error (OPTION-CODE 15 {{!RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
+The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
 
 * `INFO-CODE` - Integer with the INFO-CODE
 * `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, Section 5.2)
