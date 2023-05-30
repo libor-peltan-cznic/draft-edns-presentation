@@ -21,7 +21,7 @@ author:
     ins: T. Carpay
     name: Tom Carpay
     org: NLnet Labs
-    email: tom@nlnetlabs.nl
+    email: tomcarpay@gmail.com
 
 informative:
   IANA.EDNS.Flags:
@@ -531,17 +531,17 @@ They may not make really sense and should not appear in normal DNS operation.
 
 # Guidelines for Future EDNS(0) Options
 
-This draft describes the presentation and JSON format of those ENDS(0) options, which are known at the time of writing.
-Other EDNS(0) options fall in the category of Unrecognized Options ([unrecognized](#unrecognized), [junrecognized](#junrecognized)), unless their specifications define their presentation and JSON formats explicitly.
-Following guidelines shall help defining them.
+This draft describes the presentation and JSON format of those ENDS(0) options which are known at the time of writing.
+Other EDNS(0) options fall in the category of Unrecognized Options ([unrecognized](#unrecognized), [junrecognized](#junrecognized)), unless their specifications define a presentation and JSON formats explicitly.
+The following guidelines shall help defining them.
 
 It is recommended to specify the presentation and JSON formats in every document defining new ENDS(0) options.
-Those formats should follow the options' values semantics rather than syntax, in order to make them more human-readable.
-This includes displaying enumerations' values in their text form rather than numeric (see how DAU option is treated [dau](#dau), [jdau](#jdau)), converting numeric amounts to comprehensible units (see Edns-Tcp-Keepalive Option [keepalive](#keepalive), [jkeepalive](#jkeepalive)) and adding explanatory comments if useful (see Extended DNS Error [ede](#ede), [jede](#jede)).
+Those formats should follow the semantics of the options' values rather than the syntax, in order to make them more human-readable.
+This includes displaying the values of enumerations in their text form rather than numeric (see how DAU option is treated [dau](#dau), [jdau](#jdau)), converting numeric amounts to comprehensible units (see Edns-Tcp-Keepalive Option [keepalive](#keepalive), [jkeepalive](#jkeepalive)) and adding explanatory comments if useful (see Extended DNS Error [ede](#ede), [jede](#jede)).
 
-The formats MUST be defined in a way that the reverse process of conversion back to wire format is possible and unambiguous, with the exception that JSON is not able to preserve the order of members within objects.
-When a string is ripped from the wire format, escaping rules for special characters MUST be considered.
-Treating malformed wire format MUST be taken into consideration when defining the presentation and JSON format, but a simple fallback to Unrecognized Option format is a viable treatment.
+The formats MUST be defined in a way that the reversing the process of conversion back to wire format is possible and unambiguous, with the exception that JSON is not able to preserve the order of members within objects.
+When a string is extracted from the wire format, the escaping rules for special characters MUST be considered.
+Treating malformed wire format input MUST be taken into consideration when defining the presentation and JSON format, but a simple fallback to Unrecognized Option format is a viable solution.
 See the above-defined presentation and JSON formats of existing EDNS(0) options for inspiration, analogies and tricks.
 
 # Update Representing DNS Messages in JSON {#jsonescaping}
@@ -578,7 +578,7 @@ This document has no IANA actions.
 
 # Security Considerations {#security}
 
-This document describes just textual representation of binary data, and therefore has no security impact on related protocols.
+This document only describes the textual representation of binary data, and therefore has no security impact on related protocols.
 
 When implementing software, care must be taken to handle possibly inconsistent or broken input data.
 
