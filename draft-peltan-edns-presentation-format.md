@@ -4,7 +4,7 @@ abbrev: edns-presentation-and-json-format
 docname: @DOCNAME@
 date: {DATE}
 
-category: info
+category: std
 ipr: trust200902
 keyword: Internet-Draft
 stand_alone: yes
@@ -211,7 +211,7 @@ Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE
 ## LLQ Option
 
 The LLQ (OPTION-CODE 1 {{?RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decimal values.
-The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{!RFC8764, Section 3.1}}.
+The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{?RFC8764, Section 3.1}}.
 
 Examples:
 
