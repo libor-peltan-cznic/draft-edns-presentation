@@ -83,7 +83,7 @@ capitals, as shown here.
 
 * EDNS(0) signifies EDNS version 0.
 
-* "Decimal value" means an integer displayed in decimals with no leading zeroes.
+* "Decadic value" means an integer displayed in decadic base with no leading zeroes.
 
 * Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ({{!RFC4648, Section 8}}).
 
@@ -109,14 +109,14 @@ In specific:
 * Owner Name is the Owner Name of the OPT record.
 Note that this is always `.` (DNS Root Domain Name) unless malformed.
 
-* TTL is Decimal value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
+* TTL is Decadic value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
 
 * CLASS is a text representation of the 16-bit integer at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
-This will usually result in `CLASS####` (where #### will be the Decimal value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
+This will usually result in `CLASS####` (where #### will be the Decadic value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
 
 * TYPE is either `TYPE41` or `OPT`.
 
-* RDATA is formatted by `\#`, its length as Decimal value, and data as Base16 as per {{!RFC3597, Section 5}}.
+* RDATA is formatted by `\#`, its length as Decadic value, and data as Base16 as per {{!RFC3597, Section 5}}.
 
 Example:
 
@@ -159,7 +159,7 @@ See [Examples](#eexamples).
 
 The first field's Field-name is `FLAGS` and its Field-value is `0` (zero) if the EDNS flags is zero.
 
-Otherwise, the Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decimal value.
+Otherwise, the Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decadic value.
 `BITn` is present in the list if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
 If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
 (So far, the only known Flag is `DO`.)
@@ -180,8 +180,8 @@ FLAGS=BIT3,BIT7,BIT15
 
 ## Extended RCODE {#extrcode}
 
-The second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, computed from both the OPT record and the DNS Message Header.
-If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKNOWNRCODE###`, where `###` stands for the DNS message extended RCODE as Decimal value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
+The second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decadic value, computed from both the OPT record and the DNS Message Header.
+If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKNOWNRCODE###`, where `###` stands for the DNS message extended RCODE as Decadic value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
 If the extended RCODE has been computed completely and it is listed in {{IANA.RCODEs}}, its Name should be used instead of `RCODE###`.
 The Name is case-insensitive.
 
@@ -199,7 +199,7 @@ RCODE=UNKNOWNRCODE3840
 
 ## UDP Payload Size {#udpsize}
 
-The third field's Field-name is `UDPSIZE` and its Field-value is the UDP payload size as Decimal value.
+The third field's Field-name is `UDPSIZE` and its Field-value is the UDP payload size as Decadic value.
 
 ## Unrecognized Option {#unrecognized}
 
@@ -210,7 +210,7 @@ Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{?RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decimal values.
+The LLQ (OPTION-CODE 1 {{?RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decadic values.
 The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{?RFC8764, Section 3.1}}.
 
 Examples:
@@ -230,7 +230,7 @@ It is recommended to add a comment with ASCII representation of the value.
 
 ## DAU, DHU and N3U Options {#dau}
 
-The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decimal values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
+The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decadic values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
 
 Examples:
 
@@ -248,7 +248,7 @@ N3U=1
 ## Edns-Client-Subnet Option
 
 The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) Field-name is `ECS` and if FAMILY is neither IPv4 (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
-Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decimal value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decimal value.
+Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decadic value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decadic value.
 If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.
 
 Examples:
@@ -265,7 +265,7 @@ ECS=000520000102030405060708
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decimal value.
+The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decadic value.
 
 ## Cookie Option
 
@@ -274,12 +274,12 @@ The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 
 
 ## Edns-Tcp-Keepalive Option {#keepalive}
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as decimal number with exactly one decimal digit and a dot as decimal separator.
+The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as Decadic number with exactly one Decadic digit and a dot as Decadic separator.
 
 ## Padding Option {#padding}
 
 The Padding (OPTION-CODE 12 {{?RFC7830}}) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
-If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decimal value.
+If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decadic value.
 
 ## CHAIN Option
 
@@ -287,11 +287,11 @@ The CHAIN (OPTION-CODE 13 {{?RFC7901}}) Field-name is `CHAIN` and its Field-valu
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decimal values.
+The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decadic values.
 
 ## Extended DNS Error Option {#ede}
 
-The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decimal value.
+The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decadic value.
 It is recommended to add a comment with the Purpose of the given code (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
 
 If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
@@ -379,7 +379,7 @@ Note that the order of members is not preserved in JSON.
 
 ## Flags {#jflags}
 
-The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decimal value.
+The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decadic value.
 `BITn` is present in the Array if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
 If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
 (So far, the only known Flag is `DO`.)
@@ -397,7 +397,7 @@ The JSON member name is `UDPSIZE` and its value is an Integer with UDP payload s
 EDNS options that are not part of this specification and their own specifications do not specify their JSON member name and value MUST be displayed according this subsection.
 Other options (specified below or otherwise) MAY be displayed so as well.
 
-Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTION-CODE as Decimal value, and its value is a String containing its OPTION-VALUE encoded as Base16.
+Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTION-CODE as Decadic value, and its value is a String containing its OPTION-VALUE encoded as Base16.
 
 ## LLQ Option
 
