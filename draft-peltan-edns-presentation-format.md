@@ -96,18 +96,14 @@ capitals, as shown here.
 * "Note" denotes a sentence that is not normative. Instead, it points out some non-obvious consequences of previous statements.
 
 
-# Version-independent Presentation Format {#independent}
+# Generic EDNS Presentation Format {#independent}
 
-EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
-This section specifies how to convert such OPT pseudorecord to Presentation format.
-This procedure SHOULD NOT be used for EDNS(0).
-One possible exception is displaying a malformed EDNS(0) record.
-
+A malformed EDNS record or a record of unsupported EDNS version can be converted to Presentation format using this generic method.
 OPT pseudorecord is in this case represented the same way as a RR of unknown type according to {{!RFC3597, Section 5}}.
 In specific:
 
 * Owner Name is the Owner Name of the OPT record.
-Note that this is always `.` (DNS Root Domain Name) unless malformed.
+Note that this is usually `.` (DNS Root Domain Name) unless malformed.
 
 * TTL is Decadic value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
 
@@ -122,6 +118,34 @@ Example:
 
 ~~~
 . 16859136 CLASS1232 TYPE41 \# 6 000F00020015
+~~~
+
+# Generic EDNS JSON representation {#jindependent}
+
+A malformed EDNS record or a record of unsupported EDNS version can be converted to JSON using this generic method.
+The OPT pseudorecord is in this case represented in JSON as an object with following members:
+
+* `NAME` - String with the Owner Name of the OPT record.
+Note that this is usually `.` (DNS Root Domain Name) unless malformed.
+See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
+
+* `TTL` - Integer with the 32-bit big-endian value appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
+
+* `CLASS` - Integer with the 16-bit value at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
+
+* `TYPE` - Integer with the value 41.
+
+* `RDATAHEX` - String with the pseudorecord RDATA formatted as Base16.
+
+Example:
+
+~~~
+{
+    "NAME": ".",
+    "TTL": 16859136,
+    "CLASS": 1232,
+    "RDATAHEX": "000f00020015"
+}
 ~~~
 
 # EDNS(0) Presentation Format
@@ -332,39 +356,6 @@ They may not make really sense and should not appear in normal DNS operation.
                NSID=6578616d706c652e636f6d2e ; example.com.
                DAU=8,10 KEEPALIVE=60.0 CHAIN=zerobyte\000.com.
                KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
-~~~
-
-# Version-independent JSON representation {#jindependent}
-
-EDNS versions other than 0 are not yet specified, but an OPT pseudorecord with version field set to value other than zero might in theory appear in DNS messages.
-This section specifies how to represent such OPT pseudorecord in JSON.
-This procedure SHOULD NOT be used for EDNS(0).
-One possible exception is displaying a malformed EDNS(0) record.
-
-The OPT pseudorecord is in this case represented in JSON as on object called `EDNS` with following members:
-
-* `NAME` - String with the Owner Name of the OPT record.
-Note that this is always `.` (DNS Root Domain Name) unless malformed.
-See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
-
-* `TTL` - Integer with the 32-bit big-endian value appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
-
-* `CLASS` - Integer with the 16-bit value at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
-
-* `TYPE` - Integer with the value 41.
-This member MAY be omitted.
-
-* `RDATAHEX` - String with the pseudorecord RDATA formatted as Base16.
-
-Example:
-
-~~~
-"EDNS": {
-    "NAME": ".",
-    "TTL": 16859136,
-    "CLASS": 1232,
-    "RDATAHEX": "000f00020015"
-}
 ~~~
 
 # EDNS(0) Representation in JSON
