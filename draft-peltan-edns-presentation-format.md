@@ -87,14 +87,13 @@ capitals, as shown here.
 
 * Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ({{!RFC4648, Section 8}}).
 
-* "Followed by" in terms of strings denotes their concatenation, with no other characters nor space between them.
-
 * Backslash is the character called also Reverse Solidus, ASCII code 0x5c.
 
 * Zero-octet is an octet with all bits set to 0, i.e. ASCII code 0x00.
 
-* "Note" denotes a sentence that is not normative. Instead, it points out some non-obvious consequences of previous statements.
+* ID-string is a string of characters containing only (uppercase or lowercase) letters, digits, dashes and underscores and its first character is a (uppercase or lowercase) letter
 
+* "Note" denotes a sentence that is not normative. Instead, it points out some non-obvious consequences of previous statements.
 
 # Generic EDNS Presentation Format {#independent}
 
@@ -148,9 +147,33 @@ Example:
 }
 ~~~
 
-# EDNS(0) Presentation Format
+# Common Concept
 
-The EDNS(0) Presentation Format follows RR format of the master file ({{!RFC1035, Section 5.1}}), including quotation of non-printable characters, multi-line format using round brackets, and semicolons denoting comments.
+Let's first divide the information contained in the EDNS record into <em>FIELD</em>s: `Version`, `FLAGS`, `RCODE`, and `UDPSIZE` <em>FIELD</em>s are based on OPT record header, one other <em>FIELD</em> is based on every EDNS option that appears in the OPT record RDATA.
+Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, and <em>FIELD-VALUE</em> of type <em>FIELD-TYPE</em>, which is one of following:
+
+* <em>int</em>, a non-negative integer
+
+* <em>ID-NAME</em>, a mnemonic string denoting a numeric value defined by this document, other referenced RFC and/or referenced IANA table; mnemonics that are not ID-strings MUST NOT be used
+
+* <em>ID-CODE</em>, a non-negative integer prefixed with a fixed ID-string
+
+* <em>mixed</em>, a variant type that can be any of the above defined types
+
+* <em>base16</em>, an even number of hexadecimal (case insensitive) digits representing a string of arbitrary octets
+
+* <em>list</em>, a variable-sized (possibly empty) list of values of homogenous type defined above (possibly <em>mixed</em>)
+
+* <em>dname</em>, a Fully-Qualified Domain Name
+
+* <em>string</em>, a string of arbitrary octets where quoting and escaping is used to represent it as ASCII string
+
+* <em>object</em>, a defined fixed number of <em>SUBFIELD</em>s, each having its <em>FIELD-NAME</em> and <em>FIELD-TYPE</em> defined according to the rules above (nested <em>object</em>s are forbidden)
+
+# EDNS Presentation Format
+
+The EDNS Presentation Format follows RR format of the master file ({{!RFC1035, Section 5.1}}), including quotation of non-printable characters, multi-line format using round brackets, and semicolons denoting comments.
+However, one difference is that &lt;character-string&gt;s are not limited in size (to 255 represented octets).
 
 Depending on use-case, implementations MAY choose to display only RDATA.
 In the case the resource-record-like Presentation format is desired, the following applies:
@@ -159,178 +182,229 @@ In the case the resource-record-like Presentation format is desired, the followi
 
 * TTL MAY be omitted.
 If it is present, it MUST be `0` (zero).
-Note that this differs from DNS RR wire-to-text conversion, as well as [Version-independent Presentation Format](#independent).
+Note that this differs from DNS RR wire-to-text conversion, as well as [Generic Presentation Format](#independent).
 
 * CLASS MAY be omitted.
 If it is present, it MUST be `ANY`.
 
-* TYPE MUST be `EDNS0`.
+* TYPE MUST be `EDNS`.
 
-RDATA consists of at least three &lt;character-string&gt;s ({{!RFC1035, Section 5.1}}), one for each field.
-Each field consists of a Field-name, followed by an equal sign (`=`), followed by a Field-value.
-If the Field-value is empty or omitted, the equal sign MUST be omitted as well.
-For each field, the Field-name and the Field-value are defined by this document, or by the specification of the respective EDNS Option.
-If it is not, a generic Field-name and Field-value from [unrecognized](#unrecognized) applies.
-However, those generics MAY be used for any Option at all times.
+RDATA consists of &lt;character-string&gt;s, each <em>FIELD</em> is represented by at least two of them.
+First represented <em>FIELD</em>s are `Version`, `FLAGS`, `RCODE`, and `UDPSIZE` in this order, however, `Version` MAY be omitted if the EDNS Version is zero.
+The rest of <em>FIELD</em>s respect the EDNS options in the same order as the appear in the OPT record, including possibly repeated options.
+The following paragraph defines how a single <em>FIELD</em> is represented with &lt;character-string&gt;s.
 
-The first three fields, [Flags](#eflags), [Extended RCODE](#extrcode), and [UDP Payload Size](#udpsize) MUST always be present.
-The rest of the fields are based on Options in the OPT record {{!RFC6891, Section 6.1.2}}.
-They MUST be presented in the same order as they appear in wire format.
-It is recommended to use the multi-line format with comments at each field, together with a more human-readable form of the contents of each option when available.
-See [Examples](#eexamples).
+The first &lt;character-string&gt; is the <em>FIELD-NAME</em> concatenated (no spaces in between) with a colon (`:`) and SHOULD NOT be enclosed in quotes.
+The rest depends on the <em>FIELD-TYPE</em>:
+
+* <em>int</em> is represented as Decadic number
+
+* <em>ID-NAME</em> or <em>ID-CODE</em> is represented as-is
+
+* <em>base16</em> is represented as-is, zero-length <em>base16</em> as an empty string enclosed in quotes (`""`)
+
+* <em>list</em> is represented as a comma-separated list of its items with no spaces, empty list as an empty string enclosed in quotes (`""`)
+
+* <em>dname</em> is represented according to the rules of representing Domain names in master file ({{!RFC1035, Section 5.1}}); Internationalized Domain Name (IDN) labels MAY be expressed in their U-label form, as described in {{!RFC5890}}.
+
+* <em>string</em> is represented s &lt;character-string&gt; according to {{!RFC1035, Section 5.1}}; and SHOULD be enclosed in quotes even when not containing any spaces
+
+* <em>object</em> is represented by the same number of &lt;character-string&gt;s as how many <em>SUBFIELD</em>s it has; their <em>FIELD-NAME</em>s are ignored and <em>FIELD-VALUE</em>s are represented in their defined order
+
+# EDNS Representation in JSON
+
+The EDNS OPT record can be represented in JSON as an object called `EDNS`.
+Each <em>FIELD</em> is represented as one object member (name-value pair) where the name is <em>FIELD-NAME</em> and the value depends on <em>FIELD-TYPE</em>:
+
+* <em>int</em> is represented as an Integer
+
+* <em>ID-NAME</em>, <em>ID-CODE</em> or <em>base16</em> is represented as a String
+
+* <em>mixed</em> is represented as String even when it happens to be <em>int</em>
+
+* <em>list</em> is represented as a JSON Array containing its members in specified order
+
+* <em>dname</em> is represented as a String with quotation rules in [jsonescaping](#jsonescaping)
+
+* <em>string</em> is represented as a String according to {{!RFC8259, Section 7}}
+
+* <em>object</em> is represented as a JSON object with each <em>SUBFIELD</em> represented as one its member according to rules above (note that nested <em>object</em>s are forbidden)
+
+Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `FLAGS`, `RCODE`, and `UDPSIZE` MUST be represented, `Version` MAY be omitted if the EDNS Version is zero.
+
+# Field Definitions
+
+## Version {#version}
+
+EDNS Version is represented by <em>FIELD-NAME</em> is `Version`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the EDNS Version.
 
 ## Flags {#eflags}
 
-The first field's Field-name is `FLAGS` and its Field-value is `0` (zero) if the EDNS flags is zero.
+EDNS FLAGS is represented by <em>FIELD-NAME</em> is `FLAGS` and its <em>FIELD-TYPE</em> is a <em>list</em> of <em>mixed</em>:
 
-Otherwise, the Field-value consists of comma-separated list of the items `BIT##`, where `##` is a Decadic value.
-`BITn` is present in the list if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
-(So far, the only known Flag is `DO`.)
+* <em>ID-NAME</em> `DO` if the DO bit is set
 
-Examples:
+* <em>ID-CODE</em> `BITn` for each `n`-th bit (other than DO) set
 
-~~~
-FLAGS=0
-~~~
+Examples of Presentation format:
 
 ~~~
-FLAGS=DO,BIT1
+FLAGS: ""
 ~~~
 
 ~~~
-FLAGS=BIT3,BIT7,BIT15
+FLAGS: DO,BIT1
+~~~
+
+~~~
+FLAGS: BIT3,BIT7,BIT14
 ~~~
 
 ## Extended RCODE {#extrcode}
 
-The second field's Field-name is `RCODE` and its Field-value is `RCODE###`, where `###` stands for the DNS message extended RCODE as Decadic value, computed from both the OPT record and the DNS Message Header.
-If the lower four bits of extended RCODE in DNS Message Header can not be used, the Field-value is `UNKNOWNRCODE###`, where `###` stands for the DNS message extended RCODE as Decadic value, with the lower four bits set to zero (i.e. the four-bit left shift still applies).
-If the extended RCODE has been computed completely and it is listed in {{IANA.RCODEs}}, its Name should be used instead of `RCODE###`.
-The Name is case-insensitive.
+Extended RCODE is represented by <em>FIELD-NAME</em> is `RCODE` and its <em>FIELD-TYPE</em> is a <em>mixed</em>.
 
-Examples:
+For the sake of readability, it is RECOMMENDED to compute the whole DNS Message Extended RCODE from both the OPT record and the DNS Message Header.
+If the whole DNS Message Extended RCODE is computed and has a mnemonic in {{IANA.RCODEs}}, the <em>FIELD-VALUE</em> MAY be this mnemonic as <em>ID-NAME</em>.
+If the whole DNS Message Extended RCODE is computed and no mnemonic is available (or used), the <em>FIELD-VALUE</em> is an <em>int</em> with the computed Extended RCODE.
+If the whole DNS Message Extended RCODE can not be computed, the <em>FIELD-VALUE</em> is an <em>ID-CODE</em> `EXT##`, where `##` stands for DNS Message Extended RCODE with the lower four bits set to zero (i.e. the four-bit left shift still applies).
+
+Examples of Presentation format:
 
 ~~~
-RCODE=NXDOMAIN
+RCODE: NXDOMAIN
 ~~~
 ~~~
-RCODE=RCODE3841
+RCODE: 3841
 ~~~
 ~~~
-RCODE=UNKNOWNRCODE3840
+RCODE: EXT3840
 ~~~
 
 ## UDP Payload Size {#udpsize}
 
-The third field's Field-name is `UDPSIZE` and its Field-value is the UDP payload size as Decadic value.
+UDP Payload Size is represented by <em>FIELD-NAME</em> is `UDPSIZE`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the UDP Payload Size.
 
 ## Unrecognized Option {#unrecognized}
 
 EDNS options that are not part of this specification and their own specifications do not specify their Field-name and Field-value MUST be displayed according this subsection.
 Other options (specified below or otherwise) MAY be displayed so as well.
 
-Unrecognized option Field-name is `OPT##`, where `##` stands for its OPTION-CODE, and Field-value is its OPTION-VALUE displayed as Base16.
+Unrecognized EDNS option is represented by <em>FIELD-NAME</em> is `OPT##`, where `##` stands for its OPTION-CODE, its <em>FIELD-TYPE</em> is <em>base16</em> and <em>FIELD-VALUE</em> is its OPTION-VALUE encoded as Base16.
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{?RFC8764}}) Field-name is `LLQ` and Field-value is comma-separated tuple of LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE as Decadic values.
-The numeric values of LLQ-OPCODE and LLQ-ERROR MAY be substituted with their textual representations listed in {{?RFC8764, Section 3.1}}.
+The LLQ (OPTION-CODE 1 {{?RFC8764}}) option is represented by <em>FIELD-NAME</em> `LLQ` and its <em>FIELD-VALUE</em> is a <em>list</em> of <em>int</em>s with LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE in this order.
 
-Examples:
+Example of Presentation format:
 
 ~~~
 LLQ=1,1,0,0,3600
 ~~~
-~~~
-LLQ=1,LLQ-SETUP,NO-ERROR,0,3600
-~~~
 
 ## NSID Option
 
-The NSID (OPTION-CODE 3 {{?RFC5001}}) Field-name is `NSID` and Field-value is its OPTION-VALUE displayed as Base16.
+The NSID (OPTION-CODE 3 {{?RFC5001}}) option is represented by <em>FIELD-NAME</em> `NSID` and its <em>FIELD-VALUE</em> is an object with two <em>SUBFIELD</em>s in following order:
 
-It is recommended to add a comment with ASCII representation of the value.
+* first <em>FIELD-NAME</em> is `HEX` and <em>FIELD-VALUE</em> is a <em>base16</em> representation of the OPTION-VALUE
+
+* second <em>FIELD-NAME</em> is `TXT` and <em>FIELD-VALUE</em> is a <em>string</em> representation of the OPTION-VALUE, however, it MAY be substituted with empty string (for example, if the OPTION-VALUE contains or consists of non-printable characters)
 
 ## DAU, DHU and N3U Options {#dau}
 
-The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) Field-names are `DAU`, `DHU`, and `N3U`, respectively, and their Field-values consist of comma-separated lists of ALG-CODEs as Decadic values or the textual representations of the ALG-CODEs (called mnemonic in the referenced documents) found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
+The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) options are represented by <em>FIELD-NAME</em>s `DAU`, `DHU`, and `N3U`, respectively, and their `FIELD-VALUES` are <em>list</em>s of <em>int</em>s with their ALG-CODEs.
 
-Examples:
+Within Presentation format, their <em>FIELD-VALUE</em>s can be substituted with <em>list</em>s of <em>ID-NAME</em>s with the textual mnemonics of the ALG-CODEs found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
+
+Examples of Presentation format:
 
 ~~~
-DAU=RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
-DHU=SHA-1,SHA-256,SHA-384
-N3U=SHA-1
+DAU: 8,10,13,14,15
+DHU: 1,2,4
+N3U: 1
 ~~~
 ~~~
-DAU=8,10,13,14,15
-DHU=1,2,4
-N3U=1
+DAU: RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
+DHU: SHA-1,SHA-256,SHA-384
+N3U: SHA-1
 ~~~
 
 ## Edns-Client-Subnet Option
 
-The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) Field-name is `ECS` and if FAMILY is neither IPv4 (`1`) nor IPv6 (`2`), its Field-value is the whole OPTION-VALUE as Base16.
-Otherwise, it consists of the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), followed by a slash (`/`), followed by SOURCE PREFIX-LENGTH as Decadic value, followed by another slash, followed by SCOPE PREFIX-LENGTH as Decadic value.
-If SCOPE PREFIX-LENGTH is zero, it MUST be omitted together with the second slash.
+The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) option is represented by <em>FIELD-NAME</em> `ECS` and its <em>FIELD-TYPE</em> is a <em>string</em>.
+If FAMILY is either IPv4 (`1`) or IPv6 (`2`) and the OPTION-LENGTH matches the expected length, the <em>FIELD-VALUE</em> is a slash-separated (no spaces) tuple of:
 
-Examples:
+* the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), respectively
+
+* SOURCE PREFIX-LENGTH as Decadic value
+
+* SCOPE PREFIX-LENGTH as Decadic value, SHOULD be omitted (including the separating slash) if zero
+
+Otherwise, the <em>FIELD-VALUE</em> is a <em>string</em> with base16-representation of the OPTION-VALUE.
+
+Examples of Presentation format:
 
 ~~~
-ECS=1.2.3.4/24
+ECS: "1.2.3.4/24"
 ~~~
 ~~~
-ECS=1234::2/56/48
+ECS: "1234::2/56/48"
 ~~~
 ~~~
-ECS=000520000102030405060708
+ECS: "000520000102030405060708"
 ~~~
 
 ## EDNS EXPIRE Option
 
-The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) Field-name is `EXPIRE` and its Field-value, if present, is displayed as Decadic value.
+The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) option is represented by <em>FIELD-NAME</em> `EXPIRE` and its <em>FIELD-VALUE</em> is a <em>mixed</em>:
+
+* <em>ID-NAME</em> `NONE` if OPTION-LENGTH is zero
+
+* <em>int</em> with EXPIRE value otherwise
 
 ## Cookie Option
 
-The DNS Cookie (OPTION-CODE 10 {{?RFC7873}}) Field-name is `COOKIE` and its Field-value consists of the Client Cookie as Base16, followed by a comma, followed by the Server Cookie as Base16.
-The comma and Server Cookie are displayed only if OPTION-LENGTH is greater than 8.
+The DNS Cookie (OPTION-CODE 10 {{?RFC7873}}) option is represented by <em>FIELD-NAME</em> `COOKIE` and its <em>FIELD-VALUE</em> is a <em>list</em> of <em>base16</em> with the Client Cookie and, if OPTION-LENGTH is greater than 8, the Server Cookie.
 
 ## Edns-Tcp-Keepalive Option {#keepalive}
 
-The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) Field-name is `KEEPALIVE` and its Field-value is the TIMEOUT in seconds displayed as Decadic number with exactly one Decadic digit and a dot as Decadic separator.
+The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) option is represented by <em>FIELD-NAME</em> `KEEPALIVE` and its <em>FIELD-VALUE</em> is an <em>int</em> with the TIMEOUT in tenths of seconds.
 
 ## Padding Option {#padding}
 
-The Padding (OPTION-CODE 12 {{?RFC7830}}) Field-name is `PADDING` and its Field-value is its OPTION-VALUE displayed as Base16.
-If the OPTION-VALUE consists only of zero-octets, it SHOULD be substituted with an alternative Field-value `[###]`, where `###` stands for OPTION-LENGTH as Decadic value.
+The Padding (OPTION-CODE 12 {{?RFC7830}}) option is represented by <em>FIELD-NAME</em> `PADDING` and its <em>FIELD-VALUE</em> is an <em>object</em> with two <em>SUBFIELD</em>s:
+
+* first <em>FIELD-NAME</em> is `LENGTH` and its <em>FIELD-VALUE</em> is the OPTION-LENGTH as <em>int</em>
+
+* second <em>FIELD-NAME</em> is `HEX` and its <em>FIELD-VALUE</em> is a <em>string</em> with base16-representation of OPTION-DATA
+
+If the OPTION-DATA consists only of Zero-octets, the `HEX` <em>SUBFIELD</em> SHOULD be an empty <em>string</em> (in case of Presentation format) or completely omitted (in case of JSON).
 
 ## CHAIN Option
 
-The CHAIN (OPTION-CODE 13 {{?RFC7901}}) Field-name is `CHAIN` and its Field-value, the Closest trust point, is displayed as a textual Fully-Qualified Domain Name.
+The CHAIN (OPTION-CODE 13 {{?RFC7901}}) option is represented by <em>FIELD-NAME</em> `CHAIN` and its <em>FIELD-VALUE</em> is the Closest trust point as <em>dname</em>.
 
 ## Edns-Key-Tag Option
 
-The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) Field-name is `KEYTAG` and its Field-value is displayed as a comma-separated list of Decadic values.
+The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) option is represented by <em>FIELD-NAME</em> `KEYTAG` and its <em>FIELD-VALUE</em> is the list of Key Tag values as <em>list</em> of <em>int</em>s.
 
 ## Extended DNS Error Option {#ede}
 
-The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) Field-name is `EDE` and the Field-value is its INFO-CODE as Decadic value.
-It is recommended to add a comment with the Purpose of the given code (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}).
+The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) option is represented by <em>FIELD-NAME</em> `EDE` and its <em>FIELD-VALUE</em> is an <em>object</em> with three <em>SUBFIELD</em>s:
 
-If the EXTRA-TEXT is nonempty, it MUST be displayed as another field, with Field-name `EDETXT` and Field-value being the EXTRA-TEXT string as-is.
+* first <em>FIELD-NAME</em> is `INFO-CODE` and its <em>FIELD-VALUE</em> is the INFO-CODE as <em>int</em>
 
-Note that RFC1035-style escaping applies to all non-printable and non-ASCII characters, including some eventual UTF-8 bi-characters and possible trailing zero-octet.
-Also note that any presence of spaces requires the whole &lt;character-string&gt; to be enclosed in quotes, not just the Field-value.
+* second <em>FIELD-NAME</em> is `Purpose` and its <em>FIELD-VALUE</em> is the Purpose (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}) as <em>string</em>
 
-Examples:
+* third <em>FIELD-NAME</em> is `EXTRA-TEXT` and its <em>FIELD-VALUE</em> is the EXTRA-TEXT as <em>string</em> (possibly of zero length)
+
+Examples of Presentation format:
 
 ~~~
-EDE=18 ; Prohibited
+EDE: 18 "Prohibited" ""
 ~~~
 ~~~
-EDE=6 ; DNSSEC_Bogus
-"EDETXT=signature too short"
+EDE: 6 "DNSSEC Bogus" "signature too short"
 ~~~
 
 # Examples of EDNS(0) Presentation Format {#eexamples}
@@ -339,165 +413,33 @@ The following examples shall illustrate the features of EDNS(0) Presentation for
 They may not make really sense and should not appear in normal DNS operation.
 
 ~~~
-. 0 IN EDNS0 (
-    FLAGS=DO
-    RCODE=BADCOOKIE
-    UDPSIZE=1232
-    EXPIRE=86400
-    COOKIE=36714f2e8805a93d,4654b4ed3279001b
-    EDE=18 ; Prohibited
-    "EDETXT=bad cookie\000"
-    OPT1234=000004d2
-    PADDING=[113]
+. 0 IN EDNS (
+    Version: 0
+    FLAGS: DO
+    RCODE: BADCOOKIE
+    UDPSIZE: 1232
+    EXPIRE: 86400
+    COOKIE: 36714f2e8805a93d,4654b4ed3279001b
+    EDE: 18 "Prohibited" "bad cookie\000"
+    OPT1234: 000004d2
+    PADDING: 113 ""
     )
 ~~~
 ~~~
-. 0 IN EDNS0 ( FLAGS=0 RCODE=BADSIG UDPSIZE=4096 EXPIRE
-               NSID=6578616d706c652e636f6d2e ; example.com.
-               DAU=8,10 KEEPALIVE=60.0 CHAIN=zerobyte\000.com.
-               KEYTAG=36651,6113 PADDING=df24d08b0258c7de )
+. 0 IN EDNS ( FLAGS: 0 RCODE: BADSIG UDPSIZE: 4096 EXPIRE: NONE
+              NSID: 6578616d706c652e636f6d2e "example.com."
+              DAU: 8,10 KEEPALIVE: 600 CHAIN: zerobyte\000.com.
+              KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
 ~~~
-
-# EDNS(0) Representation in JSON
-
-The EDNS(0) OPT record can be represented in JSON as an object called `EDNS0`.
-It MUST contain the three members (name-value pairs), [Flags](#jflags), [Extended RCODE](#jextrcode), and [UDP Payload Size](#judpsize).
-The rest of the members are based on Options in the OPT record {{!RFC6891, Section 6.1.2}}.
-For each member, its name and value are defined by this document, or by the specification of the respective EDNS Option.
-If it is not, a generic name and value from [junrecognized](#junrecognized) applies.
-However, those generics MAY be used for any Option at all times.
-Note that the order of members is not preserved in JSON.
-
-## Flags {#jflags}
-
-The JSON member name is `FLAGS` and its value is an Array of Strings `BIT##`, where `##` is a Decadic value.
-`BITn` is present in the Array if and only if `n`-th bit (the most significant bit being `0`-th) of flags is set to `1`.
-If the Flag of the bit is specified in {{IANA.EDNS.Flags}}, the Flag SHOULD be used instead of `BIT##`.
-(So far, the only known Flag is `DO`.)
-
-## Extended RCODE {#jextrcode}
-
-The JSON member name is `RCODE` and its value is a String containing Field-value from [extrcode](#extrcode).
-
-## UDP Payload Size {#judpsize}
-
-The JSON member name is `UDPSIZE` and its value is an Integer with UDP payload size.
-
-## Unrecognized Option {#junrecognized}
-
-EDNS options that are not part of this specification and their own specifications do not specify their JSON member name and value MUST be displayed according this subsection.
-Other options (specified below or otherwise) MAY be displayed so as well.
-
-Unrecognized option JSON member name is `OPT##`, where `##` stands for its OPTION-CODE as Decadic value, and its value is a String containing its OPTION-VALUE encoded as Base16.
-
-## LLQ Option
-
-The LLQ (OPTION-CODE 1 {{?RFC8764}}) JSON member name is `LLQ` and its value is an Object with members `LLQ-VERSION`, `LLQ-OPCODE`, `LLQ-ERROR`, `LLQ-ID`, and `LLQ-LEASE`, each representing the respective value as Integer.
-Note that only numeric representation of these values is possible.
-
-Example:
-
-~~~
-"LLQ": { "LLQ-VERSION": 1, "LLQ-OPCODE": 1, "LLQ-ERROR": 0,
-         "LLQ-ID": 0, "LLQ-LEASE": 3600 }
-~~~
-
-## NSID Option
-
-The NSID (OPTION-CODE 3 {{?RFC5001}}) JSON member name is `NSIDHEX` and its value is a String with OPTION-VALUE encoded as Base16.
-
-Optionally, one more member of `EDNS0` Object MAY be added as well, with the name `NSID` and the value being a String with the OPTION-VALUE interpreted as UTF-8.
-Note that in that case, JSON escaping routines ({{!RFC8259, Section 7}}) take place, possibly using the `\uXXXX` notation.
-
-## DAU, DHU and N3U Options {#jdau}
-
-The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{?RFC6975}}) JSON member names are `DAU`, `DHU`, and `N3U`, respectively, and their values are Arrays of Integers with ALG-CODEs.
-
-Example:
-
-~~~
-"DAU": [ 8, 10, 13, 14, 15 ]
-"DHU": [ 1, 2, 4 ]
-"N3U": [ 1 ]
-~~~
-
-## Edns-Client-Subnet Option
-
-The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) JSON member name is `ECS` and its value is an Object with following members:
-
-* `FAMILY` - Integer with FAMILY
-* `IP` - String with the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), or a String with ADDRESS encoded as Base16 if FAMILY is neither `1` or `2`
-* `SOURCE` - Integer with SOURCE PREFIX-LENGTH
-* `SCOPE` - Integer with SCOPE PREFIX-LENGTH, omitted if zero
-
-Examples:
-
-~~~
-"ECS": {
-    "FAMILY": 1,
-    "IP": "1.2.3.4",
-    "SOURCE": 24
-}
-~~~
-~~~
-"ECS": {
-    "FAMILY": 2,
-    "IP": "1234::2",
-    "SOURCE": 56,
-    "SCOPE": 48
-}
-~~~
-~~~
-"ECS": {
-    "FAMILY": 5,
-    "IP": "0102030405060708"
-    "SOURCE": 32
-}
-~~~
-
-## EDNS EXPIRE Option
-
-The EDNS EXPIRE (OPTION-CODE 9 {{?RFC7314}}) JSON member name is `EXPIRE` and its value is either an Integer or `null`.
-
-## Cookie Option
-
-The DNS Cookie (OPTION-CODE 10 {{?RFC7873}}) JSON member name is `COOKIE` and its value is an Array containing a String with the Client Cookie encoded as Base16 and, if present, another String with Server Cookie encoded as Base16.
-
-## Edns-Tcp-Keepalive Option {#jkeepalive}
-
-The edns-tcp-keepalive (OPTION-CODE 11 {{?RFC7828}}) JSON member name is `KEEPALIVE` and its value is the TIMEOUT in seconds formatted as a Number {{!RFC8259, Section 6}} (possibly a non-Integer).
-
-## Padding Option
-
-The Padding (OPTION-CODE 12 {{?RFC7830}}) JSON member name is `PADDING` and its value is a String containing Field-value from [padding](#padding).
-
-## CHAIN Option
-
-The CHAIN (OPTION-CODE 13 {{?RFC7901}}) JSON member name is `CHAIN` and its value is a String with the OPTION-VALUE in the form of a textual Fully-Qualified Domain Name.
-See [jsonescaping](#jsonescaping) for representing DNS names in JSON.
-
-## Edns-Key-Tag Option
-
-The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) JSON member name is `KEYTAG` and its value is an Array of Integers.
-
-## Extended DNS Error Option {#jede}
-
-The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) JSON member name is `EDE` and its value is an Object with following members:
-
-* `INFO-CODE` - Integer with the INFO-CODE
-* `Purpose` - String with Purpose of the INFO-CODE ({{!RFC8914}}, Section 5.2)
-* `EXTRA-TEXT` - String with the EXTRA-TEXT
-
-The EXTRA-TEXT member MUST be omitted if empty.
-If its value contains non-printable or special (backslash, quote) characters, they MUST be escaped by the means of JSON Strings ({{!RFC8259, Section 7}}).
 
 # Examples of EDNS(0) Representation in JSON {#jexamples}
 
-The following examples are the JSON representations of the examples in [eexamples](#eexamples).
+The following examples are the JSON equivalents of the examples in [eexamples](#eexamples).
 They may not make really sense and should not appear in normal DNS operation.
 
 ~~~
-"EDNS0": {
+"EDNS": {
+    "Version": 0,
     "FLAGS": [ "DO" ],
     "RCODE": "BADCOOKIE",
     "UDPSIZE": 1232,
@@ -509,31 +451,40 @@ They may not make really sense and should not appear in normal DNS operation.
         "EXTRA-TEXT": "bad cookie\u0000"
     },
     "OPT1234": "000004d2",
-    "PADDING": "[113]"
+    "PADDING": {
+        "LENGTH": 113
+    }
 }
 ~~~
 ~~~
-"EDNS0": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
-           "EXPIRE": null, "NSIDHEX": "6578616d706c652e636f6d2e",
-           "NSID": "example.com.", "DAU": [ 8, 10 ], "KEEPALIVE": 60.0,
-           "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
-           "PADDING": "df24d08b0258c7de" }
+"EDNS": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
+          "EXPIRE": "NONE", "NSID": { "HEX": "6578616d706c652e636f6d2e",
+          "TXT": "example.com." }, "DAU": [ 8, 10 ], "KEEPALIVE": 600,
+          "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
+          "PADDING": { "LENGTH": 8, "HEX": "df24d08b0258c7de" } }
 ~~~
 
-# Guidelines for Future EDNS(0) Options
+# Guidelines for Future EDNS Options {#guidelines}
 
-This draft describes the presentation and JSON format of those ENDS(0) options which are known at the time of writing.
-Other EDNS(0) options fall in the category of Unrecognized Options ([unrecognized](#unrecognized), [junrecognized](#junrecognized)), unless their specifications define a presentation and JSON formats explicitly.
+This draft describes the presentation and JSON format of those ENDS options which are known at the time of writing.
+Other EDNS options fall in the category of Unrecognized Options ([unrecognized](#unrecognized)), unless specified otherwise.
 The following guidelines shall help defining them.
 
-It is recommended to specify the presentation and JSON formats in every document defining new ENDS(0) options.
+When defining new EDNS options, it is recommended to specify their <em>FIELD-NAME</em>s, <em>FIELD-TYPE</em>s and the construction of <em>FIELD-VALUE</em>s so that the EDNS Presentation and JSON format comprehensibly handles them.
 Those formats should follow the semantics of the options' values rather than the syntax, in order to make them more human-readable.
-This includes displaying the values of enumerations in their text form rather than numeric (see how DAU option is treated [dau](#dau), [jdau](#jdau)), converting numeric amounts to comprehensible units (see Edns-Tcp-Keepalive Option [keepalive](#keepalive), [jkeepalive](#jkeepalive)) and adding explanatory comments if useful (see Extended DNS Error [ede](#ede), [jede](#jede)).
+If it is necessary to define new <em>FIELD-TYPE</em>, care must be taken to define its representation in Presentation and JSON format in a similar fashion like in this document.
 
-The formats MUST be defined in a way that the reversing the process of conversion back to wire format is possible and unambiguous, with the exception that JSON is not able to preserve the order of members within objects.
-When a string is extracted from the wire format, the escaping rules for special characters MUST be considered.
-Treating malformed wire format input MUST be taken into consideration when defining the presentation and JSON format, but a simple fallback to Unrecognized Option format is a viable solution.
-See the above-defined presentation and JSON formats of existing EDNS(0) options for inspiration, analogies and tricks.
+# Forward-Compatibility Considerations {#future}
+
+This specification of ENDS Presentation and JSON format prefers displaying textual mnemonics over potentionally cryptic numeric values wherever possible, which is desirable for human readers.
+It refers to several IANA tables collecting the definition of those mnemonics.
+Those tables may be getting updated throughout time, and for human readers it is still beneficial that the EDNS formats reflect those updates.
+However, this may cause difficulties for algorithms implementing the reverse process converting EDNS Presentation and/or JSON format back to wire format, because they might not understand some new mnemonics.
+This limitation has to be taken into consideration.
+
+Similarly, new documents may define Presentation and JSON format of newly defined EDNS options according to (or not according to) the guidelines above ([guidelines](#guidelines)).
+This is, again, beneficial for human readers as otherwise all new EDNS options would have to be represented as Unrecognized Options ([unrecognized](#unrecognized)).
+However, this may also cause difficulties for algorithms implementing the reverse process converting EDNS Presentation and/or JSON format back to wire format, because they might not understand some new options.
 
 # Update Representing DNS Messages in JSON {#jsonescaping}
 
@@ -581,7 +532,7 @@ TODO
 
 **Note to the RFC Editor**: please remove this entire appendix before publication.
 
-None yet.
+Earlier version of this specification draft-peltan-edns-presentation-format-01 (substantial differences in Presentation format) has been implemented in Knot DNS 3.3.0.
 
 # Change History
 
