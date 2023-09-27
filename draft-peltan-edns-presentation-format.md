@@ -546,4 +546,8 @@ Earlier version of this specification draft-peltan-edns-presentation-format-01 (
 
 > Added Guidelines for Future EDNS(0) Options, dummy IANA Considerations and Security Considerations.
 
+* edns-presentation-format-02
+
+> TODO
+
 --- back
