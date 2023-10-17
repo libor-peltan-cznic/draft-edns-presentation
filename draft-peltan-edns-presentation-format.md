@@ -383,11 +383,11 @@ The edns-key-tag (OPTION-CODE 14 {{?RFC8145, Section 4}}) option is represented 
 
 The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) option is represented by <em>FIELD-NAME</em> `EDE` and its <em>FIELD-VALUE</em> is an <em>object</em> with three <em>SUBFIELD</em>s:
 
-* first <em>FIELD-NAME</em> is `INFO-CODE` and its <em>FIELD-VALUE</em> is the INFO-CODE as <em>int</em>
+* first <em>FIELD-NAME</em> is `CODE` and its <em>FIELD-VALUE</em> is the INFO-CODE as <em>int</em>
 
 * second <em>FIELD-NAME</em> is `Purpose` and its <em>FIELD-VALUE</em> is the Purpose (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}) as <em>string</em>
 
-* third <em>FIELD-NAME</em> is `EXTRA-TEXT` and its <em>FIELD-VALUE</em> is the EXTRA-TEXT as <em>string</em> (possibly of zero length)
+* third <em>FIELD-NAME</em> is `TEXT` and its <em>FIELD-VALUE</em> is the EXTRA-TEXT as <em>string</em> (possibly of zero length)
 
 Examples of Presentation format:
 
@@ -437,9 +437,9 @@ They may not make much sense and should not appear in normal DNS operation.
     "EXPIRE": 86400,
     "COOKIE": [ "36714f2e8805a93d", "4654b4ed3279001b" ],
     "EDE": {
-        "INFO-CODE": 18,
+        "CODE": 18,
         "Purpose": "Prohibited",
-        "EXTRA-TEXT": "bad cookie\u0000"
+        "TEXT": "bad cookie\u0000"
     },
     "OPT1234": "000004d2",
     "PADDING": {
