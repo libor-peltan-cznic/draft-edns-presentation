@@ -81,15 +81,11 @@ The key words "**MUST**", "**MUST NOT**", "**REQUIRED**",
 BCP 14 {{!RFC2119}}{{!RFC8174}} when, and only when, they appear in all
 capitals, as shown here.
 
-* EDNS(0) signifies EDNS version 0.
-
 * Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ({{!RFC4648, Section 8}}).
 
 * Backslash is the character, also called Reverse Solidus, ASCII code 0x5c.
 
-* Zero-octet is an octet with all bits set to 0, i.e. ASCII code 0x00.
-
-* ID-string is a string of characters containing only (uppercase or lowercase) letters, digits, dashes, and underscores and its first character is a (uppercase or lowercase) letter.
+* ID-string is a string of characters containing only (uppercase or lowercase) letters, digits, dashes, and underscores, and its first character is a (uppercase or lowercase) letter.
 
 * "Note" denotes a sentence that is not normative. Instead, it points out some non-obvious consequences of previous statements.
 
@@ -376,7 +372,7 @@ The Padding (OPTION-CODE 12 {{?RFC7830}}) option is represented by <em>FIELD-NAM
 
 * second <em>FIELD-NAME</em> is `HEX` and its <em>FIELD-VALUE</em> is a <em>string</em> with base16-representation of OPTION-DATA
 
-If the OPTION-DATA consists only of Zero-octets, the `HEX` <em>SUBFIELD</em> SHOULD be an empty <em>string</em> (in case of Presentation format) or completely omitted (in case of JSON).
+If the OPTION-DATA consists only of zeroes (0x00 octets), the `HEX` <em>SUBFIELD</em> SHOULD be an empty <em>string</em> (in case of Presentation format) or completely omitted (in case of JSON).
 
 ## CHAIN Option
 
@@ -405,9 +401,9 @@ EDE: 18 "Prohibited" ""
 EDE: 6 "DNSSEC Bogus" "signature too short"
 ~~~
 
-# Examples of EDNS(0) Presentation Format {#eexamples}
+# Examples of EDNS Presentation Format {#eexamples}
 
-The following examples shall illustrate the features of EDNS(0) Presentation format described above.
+The following examples shall illustrate the features of EDNS Presentation format described above.
 They may not make much sense and should not appear in normal DNS operation.
 
 ~~~
@@ -430,7 +426,7 @@ They may not make much sense and should not appear in normal DNS operation.
               KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
 ~~~
 
-# Examples of EDNS(0) Representation in JSON {#jexamples}
+# Examples of EDNS Representation in JSON {#jexamples}
 
 The following examples are the JSON equivalents of the examples in [eexamples](#eexamples).
 They may not make much sense and should not appear in normal DNS operation.
@@ -542,7 +538,7 @@ An Earlier version of this specification draft-peltan-edns-presentation-format-0
 
 * edns-presentation-format-01
 
-> Added Guidelines for Future EDNS(0) Options, dummy IANA Considerations and Security Considerations.
+> Added Guidelines for Future EDNS Options, dummy IANA Considerations and Security Considerations.
 
 * edns-presentation-format-02
 
