@@ -83,8 +83,6 @@ capitals, as shown here.
 
 * EDNS(0) signifies EDNS version 0.
 
-* "Decadic value" means an integer displayed in decadic base with no leading zeroes.
-
 * Base16 is the representation of arbitrary binary data by an even number of case-insensitive hexadecimal digits ({{!RFC4648, Section 8}}).
 
 * Backslash is the character called also Reverse Solidus, ASCII code 0x5c.
@@ -104,14 +102,14 @@ In specific:
 * Owner Name is the Owner Name of the OPT record.
 Note that this is usually `.` (DNS Root Domain Name) unless malformed.
 
-* TTL is Decadic value of the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
+* TTL is the 32-bit big-endian integer appearing at the TTL position of OPT pseudorecord Wire format, see {{?RFC6891, Section 6.1.3}}.
 
 * CLASS is a text representation of the 16-bit integer at the CLASS position of OPT pseudorecord Wire format (UDP payload size happens to appear there).
-This will usually result in `CLASS####` (where #### will be the Decadic value), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
+This will usually result in `CLASS####` (where #### will be the integer), but it might also result for example in `IN` or `CH` if the value is 1 or 4, respectively.
 
 * TYPE is either `TYPE41` or `OPT`.
 
-* RDATA is formatted by `\#`, its length as Decadic value, and data as Base16 as per {{!RFC3597, Section 5}}.
+* RDATA is formatted by `\#`, its length as a decadic number, and data as Base16 as per {{!RFC3597, Section 5}}.
 
 Example:
 
@@ -197,7 +195,7 @@ The following paragraph defines how a single <em>FIELD</em> is represented with 
 The first &lt;character-string&gt; is the <em>FIELD-NAME</em> concatenated (no spaces in between) with a colon (`:`) and SHOULD NOT be enclosed in quotes.
 The rest depends on the <em>FIELD-TYPE</em>:
 
-* <em>int</em> is represented as Decadic number
+* <em>int</em> is represented as a decadic number with no leading zeroes
 
 * <em>ID-NAME</em> or <em>ID-CODE</em> is represented as-is
 
@@ -336,9 +334,9 @@ If FAMILY is either IPv4 (`1`) or IPv6 (`2`) and the OPTION-LENGTH matches the e
 
 * the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), respectively
 
-* SOURCE PREFIX-LENGTH as Decadic value
+* SOURCE PREFIX-LENGTH as a decadic number
 
-* SCOPE PREFIX-LENGTH as Decadic value, SHOULD be omitted (including the separating slash) if zero
+* SCOPE PREFIX-LENGTH as a decadic number, SHOULD be omitted (including the separating slash) if zero
 
 Otherwise, the <em>FIELD-VALUE</em> is a <em>string</em> with base16-representation of the OPTION-VALUE.
 
