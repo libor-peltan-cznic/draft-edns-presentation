@@ -24,10 +24,6 @@ author:
     email: tomcarpay@gmail.com
 
 informative:
-  IANA.EDNS.Flags:
-    target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-13
-    title: EDNS Header Flags
-
   IANA.RCODEs:
     target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6
     title: DNS RCODEs
@@ -137,6 +133,7 @@ Example:
     "NAME": ".",
     "TTL": 16859136,
     "CLASS": 1232,
+    "TYPE": 41,
     "RDATAHEX": "000f00020015"
 }
 ~~~
@@ -214,7 +211,7 @@ Each <em>FIELD</em> is represented as one object member (name-value pair) ,where
 
 * <em>ID-NAME</em>, <em>ID-CODE</em> or <em>base16</em> is represented as a String
 
-* <em>mixed</em> is represented as String even when it happens to be <em>int</em>
+* <em>mixed</em> is represented as a String even when it happens to be <em>int</em>
 
 * <em>list</em> is represented as a JSON Array containing its members in specified order
 
@@ -230,11 +227,11 @@ Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `FL
 
 ## Version {#version}
 
-EDNS Version is represented by <em>FIELD-NAME</em> is `Version`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the EDNS Version.
+EDNS Version is represented by <em>FIELD-NAME</em> `Version`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the EDNS Version.
 
 ## Flags {#eflags}
 
-EDNS FLAGS is represented by <em>FIELD-NAME</em> is `FLAGS` and its <em>FIELD-TYPE</em> is a <em>list</em> of <em>mixed</em>:
+EDNS FLAGS is represented by <em>FIELD-NAME</em> `FLAGS` and its <em>FIELD-TYPE</em> is a <em>list</em> of <em>mixed</em>:
 
 * <em>ID-NAME</em> `DO` if the DO bit is set
 
@@ -256,7 +253,7 @@ FLAGS: BIT3,BIT7,BIT14
 
 ## Extended RCODE {#extrcode}
 
-Extended RCODE is represented by <em>FIELD-NAME</em> is `RCODE` and its <em>FIELD-TYPE</em> is a <em>mixed</em>.
+Extended RCODE is represented by <em>FIELD-NAME</em> `RCODE` and its <em>FIELD-TYPE</em> is a <em>mixed</em>.
 
 For the sake of readability, it is RECOMMENDED to compute the whole DNS Message Extended RCODE from both the OPT record and the DNS Message Header.
 If the whole DNS Message Extended RCODE is computed and has a mnemonic in {{IANA.RCODEs}}, the <em>FIELD-VALUE</em> MAY be this mnemonic as <em>ID-NAME</em>.
@@ -277,14 +274,14 @@ RCODE: EXT3840
 
 ## UDP Payload Size {#udpsize}
 
-UDP Payload Size is represented by <em>FIELD-NAME</em> is `UDPSIZE`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the UDP Payload Size.
+UDP Payload Size is represented by <em>FIELD-NAME</em> `UDPSIZE`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the UDP Payload Size.
 
 ## Unrecognized Option {#unrecognized}
 
-EDNS options that are not part of this specification and their own specifications do not specify their Field-name and Field-value MUST be displayed according to this subsection.
+EDNS options that are not part of this specification, and their own specifications do not specify their <em>FIELD-NAME</em> and <em>FIELD-VALUE</em> MUST be displayed according to this subsection.
 Other options (specified below or otherwise) MAY be displayed so as well.
 
-Unrecognized EDNS option is represented by <em>FIELD-NAME</em> is `OPT##`, where `##` stands for its OPTION-CODE, its <em>FIELD-TYPE</em> is <em>base16</em> and <em>FIELD-VALUE</em> is its OPTION-VALUE encoded as Base16.
+Unrecognized EDNS option is represented by <em>FIELD-NAME</em> `OPT##`, where `##` stands for its OPTION-CODE, its <em>FIELD-TYPE</em> is <em>base16</em> and <em>FIELD-VALUE</em> is its OPTION-VALUE encoded as Base16.
 
 ## LLQ Option
 
@@ -302,13 +299,13 @@ The NSID (OPTION-CODE 3 {{?RFC5001}}) option is represented by <em>FIELD-NAME</e
 
 * first <em>FIELD-NAME</em> is `HEX` and <em>FIELD-VALUE</em> is a <em>base16</em> representation of the OPTION-VALUE
 
-* second <em>FIELD-NAME</em> is `TXT` and <em>FIELD-VALUE</em> is a <em>string</em> representation of the OPTION-VALUE, however, it MAY be substituted with an empty string (for example, if the OPTION-VALUE contains or consists of non-printable characters)
+* second <em>FIELD-NAME</em> is `TXT` and <em>FIELD-VALUE</em> is a <em>string</em> representation of the OPTION-VALUE, however, it MAY be substituted with an empty string (for example, if the OPTION-VALUE contains non-printable characters)
 
 ## DAU, DHU and N3U Options {#dau}
 
 The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively {{!RFC6975}}) options are represented by <em>FIELD-NAME</em>s `DAU`, `DHU`, and `N3U`, respectively, and their `FIELD-VALUES` are <em>list</em>s of <em>int</em>s with their ALG-CODEs.
 
-Within Presentation format, their <em>FIELD-VALUE</em>s can be substituted with <em>list</em>s of <em>ID-NAME</em>s with the textual mnemonics of the ALG-CODEs found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
+Within Presentation format, their <em>FIELD-VALUE</em>s MAY be substituted with <em>list</em>s of <em>ID-NAME</em>s with the textual mnemonics of the ALG-CODEs found in their respective IANA registries {{IANA.EDNS.DAU}}{{IANA.EDNS.DHU}}{{IANA.EDNS.N3U}}.
 
 Examples of Presentation format:
 
