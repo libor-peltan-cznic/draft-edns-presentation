@@ -500,7 +500,7 @@ Moreover, following requirements from {{!RFC8427}} still hold:
 The name MUST be represented as an absolute Fully-Qualified Domain Name.
 Internationalized Domain Name (IDN) labels MUST be expressed in their A-label form, as described in {{!RFC5890}}.
 
-Example: the name with the Wire format `04005C2E2203646F6D00` can be represented in JSON as:
+Example: the name with the Wire format `04005C2E2203636F6D00` can be represented in JSON as:
 
 ~~~
 "NAME": "\\000\\\\\\046\".com."
