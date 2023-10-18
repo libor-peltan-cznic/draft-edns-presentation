@@ -533,7 +533,7 @@ TODO
 
 **Note to the RFC Editor**: Please remove this entire appendix before publication.
 
-An Earlier version of this specification draft-peltan-edns-presentation-format-01 (substantial differences in Presentation format) has been implemented in Knot DNS 3.3.0.
+This version of this specification draft-peltan-edns-presentation-format-02 has been implemented in Knot DNS 3.3.2.
 
 # Change History
 
@@ -549,6 +549,6 @@ An Earlier version of this specification draft-peltan-edns-presentation-format-0
 
 * edns-presentation-format-02
 
-> TODO
+> Substantial re-work with common FIELD-TYPE specifications, bigger changes in presentation format and smaller in JSON.
 
 --- back
