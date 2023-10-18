@@ -202,6 +202,9 @@ The rest depends on the <em>FIELD-TYPE</em>:
 
 * <em>object</em> is represented by the same number of &lt;character-string&gt;s as how many <em>SUBFIELD</em>s it has; their <em>FIELD-NAME</em>s are ignored and <em>FIELD-VALUE</em>s are represented in their defined order
 
+Note that each <em>object</em> has fixed number of &lt;character-string&gt;s, other types have one.
+This is cruical for parsing, the colon plays only decorative role, strings might also end with a colon.
+
 # EDNS Representation in JSON
 
 The EDNS OPT record can be represented in JSON as an object called `EDNS`.
@@ -299,7 +302,10 @@ The NSID (OPTION-CODE 3 {{?RFC5001}}) option is represented by <em>FIELD-NAME</e
 
 * first <em>FIELD-NAME</em> is `HEX` and <em>FIELD-VALUE</em> is a <em>base16</em> representation of the OPTION-VALUE
 
-* second <em>FIELD-NAME</em> is `TXT` and <em>FIELD-VALUE</em> is a <em>string</em> representation of the OPTION-VALUE, however, it MAY be substituted with an empty string (for example, if the OPTION-VALUE contains non-printable characters)
+* second <em>FIELD-NAME</em> is `TEXT` and <em>FIELD-VALUE</em> is a <em>string</em> representation of the OPTION-VALUE
+
+The `TEXT` value MAY be substituted with an empty string (for example, if the OPTION-VALUE contains non-printable characters).
+Within JSON, the `TEXT` <em>SUBFIELD</em> MAY be omitted if it is an empty string.
 
 ## DAU, DHU and N3U Options {#dau}
 
@@ -369,7 +375,8 @@ The Padding (OPTION-CODE 12 {{?RFC7830}}) option is represented by <em>FIELD-NAM
 
 * second <em>FIELD-NAME</em> is `HEX` and its <em>FIELD-VALUE</em> is a <em>string</em> with base16-representation of OPTION-DATA
 
-If the OPTION-DATA consists only of zeroes (0x00 octets), the `HEX` <em>SUBFIELD</em> SHOULD be an empty <em>string</em> (in case of Presentation format) or completely omitted (in case of JSON).
+If the OPTION-DATA consists only of zeroes (0x00 octets), the `HEX` <em>SUBFIELD</em> SHOULD be an empty <em>string</em>.
+Within JSON, the `HEX` <em>SUBFIELD</em> MAY be omitted if it is an empty string.
 
 ## CHAIN Option
 
@@ -385,9 +392,12 @@ The Extended DNS Error (OPTION-CODE 15 {{?RFC8914}}) option is represented by <e
 
 * first <em>FIELD-NAME</em> is `CODE` and its <em>FIELD-VALUE</em> is the INFO-CODE as <em>int</em>
 
-* second <em>FIELD-NAME</em> is `Purpose` and its <em>FIELD-VALUE</em> is the Purpose (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}) as <em>string</em>
+* second <em>FIELD-NAME</em> is `Purpose` and its <em>FIELD-VALUE</em> is the Purpose (first presented in {{?RFC8914, Section 5.2}} and then governed by {{IANA.EDNS.EDE}}) as <em>string</em>, or an empty <em>string</em>
 
 * third <em>FIELD-NAME</em> is `TEXT` and its <em>FIELD-VALUE</em> is the EXTRA-TEXT as <em>string</em> (possibly of zero length)
+
+Within JSON, the `Purpose` <em>SUBFIELD</em> MAY be omitted if it is an empty string.
+The same applies for `TEXT` <em>SUBFIELD</em>.
 
 Examples of Presentation format:
 
