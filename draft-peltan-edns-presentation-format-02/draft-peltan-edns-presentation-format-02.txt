@@ -1,0 +1,1064 @@
+
+
+
+
+Network Working Group                                          L. Peltan
+Internet-Draft                                                    CZ.NIC
+Updates: 8427 (if approved)                                    T. Carpay
+Intended status: Standards Track                              NLnet Labs
+Expires: 20 April 2024                                   18 October 2023
+
+
+                   EDNS Presentation and JSON Format
+                draft-peltan-edns-presentation-format-02
+
+Abstract
+
+   This document describes the textual and JSON representation formats
+   of EDNS options.  It also modifies the escaping rules of the JSON
+   representation of DNS messages, previously defined in RFC8427.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 20 April 2024.
+
+Copyright Notice
+
+   Copyright (c) 2023 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 1]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   3.  Generic EDNS Presentation Format  . . . . . . . . . . . . . .   4
+   4.  Generic EDNS JSON representation  . . . . . . . . . . . . . .   4
+   5.  Common Concept  . . . . . . . . . . . . . . . . . . . . . . .   5
+   6.  EDNS Presentation Format  . . . . . . . . . . . . . . . . . .   6
+   7.  EDNS Representation in JSON . . . . . . . . . . . . . . . . .   7
+   8.  Field Definitions . . . . . . . . . . . . . . . . . . . . . .   8
+     8.1.  Version . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.2.  Flags . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+     8.3.  Extended RCODE  . . . . . . . . . . . . . . . . . . . . .   8
+     8.4.  UDP Payload Size  . . . . . . . . . . . . . . . . . . . .   9
+     8.5.  Unrecognized Option . . . . . . . . . . . . . . . . . . .   9
+     8.6.  LLQ Option  . . . . . . . . . . . . . . . . . . . . . . .   9
+     8.7.  NSID Option . . . . . . . . . . . . . . . . . . . . . . .   9
+     8.8.  DAU, DHU and N3U Options  . . . . . . . . . . . . . . . .  10
+     8.9.  Edns-Client-Subnet Option . . . . . . . . . . . . . . . .  10
+     8.10. EDNS EXPIRE Option  . . . . . . . . . . . . . . . . . . .  11
+     8.11. Cookie Option . . . . . . . . . . . . . . . . . . . . . .  11
+     8.12. Edns-Tcp-Keepalive Option . . . . . . . . . . . . . . . .  11
+     8.13. Padding Option  . . . . . . . . . . . . . . . . . . . . .  11
+     8.14. CHAIN Option  . . . . . . . . . . . . . . . . . . . . . .  11
+     8.15. Edns-Key-Tag Option . . . . . . . . . . . . . . . . . . .  12
+     8.16. Extended DNS Error Option . . . . . . . . . . . . . . . .  12
+   9.  Examples of EDNS Presentation Format  . . . . . . . . . . . .  12
+   10. Examples of EDNS Representation in JSON . . . . . . . . . . .  13
+   11. Guidelines for Future EDNS Options  . . . . . . . . . . . . .  13
+   12. Forward-Compatibility Considerations  . . . . . . . . . . . .  14
+   13. Update Representing DNS Messages in JSON  . . . . . . . . . .  14
+   14. IANA Considerations . . . . . . . . . . . . . . . . . . . . .  15
+   15. Security Considerations . . . . . . . . . . . . . . . . . . .  15
+   16. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  15
+   17. Implementation Status . . . . . . . . . . . . . . . . . . . .  15
+   18. Change History  . . . . . . . . . . . . . . . . . . . . . . .  16
+   19. References  . . . . . . . . . . . . . . . . . . . . . . . . .  16
+     19.1.  Normative References . . . . . . . . . . . . . . . . . .  16
+     19.2.  Informative References . . . . . . . . . . . . . . . . .  17
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  19
+
+
+
+
+
+
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 2]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+1.  Introduction
+
+   A DNS record[RFC1035] of any type can be converted between its binary
+   Wire format and textual Presentation format.  The Wire format is used
+   in DNS messages transferred over the Internet, while the Presentation
+   format is used not only in Zone Files (called "master files" in the
+   referenced document), but also to display the contents of DNS
+   messages to humans by debugging utilities and possible other use-
+   cases.
+
+   The Presentation format can, however, be processed programatically
+   and also converted back to Wire Format unambiguously.
+
+   The EDNS[RFC6891] option pseudo-record does not appear in Zone Files,
+   but it sometimes needs to be converted to human-readable or even
+   machine-readable textual representation.  This document describes
+   such a Presentation Format of the OPT pseudo-record.  It is advised
+   to use this when displaying an OPT pseudo-record to humans.  It is
+   recommended to use this when the textual format is expected to be
+   machine-processed further.
+
+   The JSON[RFC8259] representation[RFC8427] of DNS messages is also
+   helpful as both human-readable and machine-readable format (despite
+   the limitation in non-preservation of the order of options, which
+   prevents reversing the conversion unambiguously), but it did not
+   define a JSON representation of EDNS option pseudo-record.  This
+   document defines it.
+
+   The aforementioned document[RFC8427] also defined ambiguous and
+   possibly conflicting rules for escaping special characters when
+   representing DNS names in JSON.  This document modifies and clarifies
+   those rules.
+
+2.  Terminology
+
+   The key words "*MUST*", "*MUST NOT*", "*REQUIRED*", "*SHALL*",
+   "*SHALL NOT*", "*SHOULD*", "*SHOULD NOT*", "*RECOMMENDED*", "*NOT
+   RECOMMENDED*", "*MAY*", and "*OPTIONAL*" in this document is to be
+   interpreted as described in BCP 14 [RFC2119][RFC8174] when, and only
+   when, they appear in all capitals, as shown here.
+
+   *  Base16 is the representation of arbitrary binary data by an even
+      number of case-insensitive hexadecimal digits ([RFC4648],
+      Section 8).
+
+   *  Backslash is the character, also called Reverse Solidus, ASCII
+      code 0x5c.
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 3]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   *  ID-string is a string of characters containing only (uppercase or
+      lowercase) letters, digits, dashes, and underscores, and its first
+      character is a (uppercase or lowercase) letter.
+
+   *  "Note" denotes a sentence that is not normative.  Instead, it
+      points out some non-obvious consequences of previous statements.
+
+3.  Generic EDNS Presentation Format
+
+   A malformed EDNS record or a record of an unsupported EDNS version
+   can be converted to Presentation format using this generic method.
+   OPT pseudo-record is, in this case, represented the same way as a RR
+   of unknown type according to [RFC3597], Section 5.  In specific:
+
+   *  Owner Name is the Owner Name of the OPT record.  Note that this is
+      usually . (DNS Root Domain Name) unless malformed.
+
+   *  TTL is the 32-bit big-endian integer appearing at the TTL position
+      of the OPT pseudo-record Wire format, see [RFC6891],
+      Section 6.1.3.
+
+   *  CLASS is a text representation of the 16-bit integer at the CLASS
+      position of the OPT pseudo-record Wire format (UDP payload size
+      happens to appear there).  This will usually result in CLASS####
+      (where #### will be the integer), but it might also result, for
+      example in IN or CH if the value is 1 or 4, respectively.
+
+   *  TYPE is either TYPE41 or OPT.
+
+   *  RDATA is formatted by \#, its length as a decadic number, and data
+      as Base16 as per [RFC3597], Section 5.
+
+   Example:
+
+   . 16859136 CLASS1232 TYPE41 \# 6 000F00020015
+
+4.  Generic EDNS JSON representation
+
+   A malformed EDNS record or a record of an unsupported EDNS version
+   can be converted to JSON using this generic method.  The OPT pseudo-
+   record is, in this case, represented in JSON as an object with
+   following members:
+
+   *  NAME - String with the Owner Name of the OPT record.  Note that
+      this is usually . (DNS Root Domain Name) unless malformed.  See
+      Section 13 for representing DNS names in JSON.
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 4]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   *  TTL - Integer with the 32-bit big-endian value appearing at the
+      TTL position of the OPT pseudo-record Wire format, see [RFC6891],
+      Section 6.1.3.
+
+   *  CLASS - Integer with the 16-bit value at the CLASS position of the
+      OPT pseudo-record Wire format (UDP payload size happens to appear
+      there).
+
+   *  TYPE - Integer with the value 41.
+
+   *  RDATAHEX - String with the pseudo-record RDATA formatted as
+      Base16.
+
+   Example:
+
+   {
+       "NAME": ".",
+       "TTL": 16859136,
+       "CLASS": 1232,
+       "TYPE": 41,
+       "RDATAHEX": "000f00020015"
+   }
+
+5.  Common Concept
+
+   Let's first divide the information contained in the EDNS record into
+   _FIELD_s: Version, FLAGS, RCODE, and UDPSIZE _FIELD_s are based on
+   the OPT record header, one other _FIELD_ is based on every EDNS
+   option that appears in the OPT record RDATA.  Each _FIELD_ has a
+   defined _FIELD-NAME_, which is an ID-string, and _FIELD-VALUE_ of
+   type _FIELD-TYPE_, which is one of the following:
+
+   *  _int_, a non-negative integer
+
+   *  _ID-NAME_, a mnemonic string denoting a numeric value defined by
+      this document, other referenced RFC, and/or referenced IANA table;
+      mnemonics that are not ID-strings MUST NOT be used
+
+   *  _ID-CODE_, a non-negative integer prefixed with a fixed ID-string
+
+   *  _mixed_, a variant type that can be any of the above-defined types
+
+   *  _base16_, an even number of hexadecimal (case-insensitive) digits
+      representing a string of arbitrary octets
+
+   *  _list_, a variable-sized (possibly empty) list of values of
+      homogenous type defined above (possibly _mixed_)
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 5]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   *  _dname_, a Fully-Qualified Domain Name
+
+   *  _string_, a string of arbitrary octets where quoting and escaping
+      is used to represent it as ASCII string
+
+   *  _object_, a defined fixed number of _SUBFIELD_s, each having its
+      _FIELD-NAME_ and _FIELD-TYPE_ defined according to the rules above
+      (nested _object_s are forbidden)
+
+6.  EDNS Presentation Format
+
+   The EDNS Presentation Format follows the RR format of the master file
+   ([RFC1035], Section 5.1), including quotation of non-printable
+   characters, multi-line format using round brackets, and semicolons
+   denoting comments.  However, one difference is that <character-
+   string>s are not limited in size (to 255 represented octets).
+
+   Depending on the use-case, implementations MAY choose to display only
+   RDATA.  In the event that the resource-record-like Presentation
+   format is desired, the following applies:
+
+   *  Owner Name MUST be . (DNS Root Domain Name).
+
+   *  TTL MAY be omitted.  If it is present, it MUST be 0 (zero).  Note
+      that this differs from DNS RR wire-to-text conversion as well as
+      Generic Presentation Format (Section 3).
+
+   *  CLASS MAY be omitted.  If it is present, it MUST be ANY.
+
+   *  TYPE MUST be EDNS.
+
+   RDATA consists of <character-string>s, each _FIELD_ is represented by
+   at least two of them.  First represented _FIELD_s are Version, FLAGS,
+   RCODE, and UDPSIZE in this order; however, Version MAY be omitted if
+   the EDNS Version is zero.  The rest of _FIELD_s respect the EDNS
+   options in the same order as they appear in the OPT record, including
+   possibly repeated options.  The following paragraph defines how a
+   single _FIELD_ is represented with <character-string>s.
+
+   The first <character-string> is the _FIELD-NAME_ concatenated (no
+   spaces in between) with a colon (:) and SHOULD NOT be enclosed in
+   quotes.  The rest depends on the _FIELD-TYPE_:
+
+   *  _int_ is represented as a decadic number with no leading zeroes
+
+   *  _ID-NAME_ or _ID-CODE_ is represented as-is
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 6]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   *  _base16_ is represented as-is, zero-length _base16_ as an empty
+      string enclosed in quotes ("")
+
+   *  _list_ is represented as a comma-separated list of its items with
+      no spaces; an empty list as an empty string enclosed in quotes
+      ("")
+
+   *  _dname_ is represented according to the rules of representing
+      Domain names in the master file ([RFC1035], Section 5.1);
+      Internationalized Domain Name (IDN) labels MAY be expressed in
+      their U-label form, as described in [RFC5890].
+
+   *  _string_ is represented as <character-string> according to
+      [RFC1035], Section 5.1; and SHOULD be enclosed in quotes even when
+      not containing any spaces
+
+   *  _object_ is represented by the same number of <character-string>s
+      as how many _SUBFIELD_s it has; their _FIELD-NAME_s are ignored
+      and _FIELD-VALUE_s are represented in their defined order
+
+   Note that each _object_ has fixed number of <character-string>s,
+   other types have one.  This is cruical for parsing, the colon plays
+   only decorative role, strings might also end with a colon.
+
+7.  EDNS Representation in JSON
+
+   The EDNS OPT record can be represented in JSON as an object called
+   EDNS.  Each _FIELD_ is represented as one object member (name-value
+   pair) ,where the name is _FIELD-NAME_ and the value depends on
+   _FIELD-TYPE_:
+
+   *  _int_ is represented as an Integer
+
+   *  _ID-NAME_, _ID-CODE_ or _base16_ is represented as a String
+
+   *  _mixed_ is represented as a String even when it happens to be
+      _int_
+
+   *  _list_ is represented as a JSON Array containing its members in
+      specified order
+
+   *  _dname_ is represented as a String with quotation rules in
+      Section 13
+
+   *  _string_ is represented as a String according to [RFC8259],
+      Section 7
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 7]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   *  _object_ is represented as a JSON object with each _SUBFIELD_
+      represented as one of its member according to rules above (note
+      that nested _object_s are forbidden)
+
+   Note that the order of members is not preserved in JSON.  The
+   _FIELD_s FLAGS, RCODE, and UDPSIZE MUST be represented, Version MAY
+   be omitted if the EDNS Version is zero.
+
+8.  Field Definitions
+
+8.1.  Version
+
+   EDNS Version is represented by _FIELD-NAME_ Version, its _FIELD-TYPE_
+   is _int_ and _FIELD-VALUE_ is the EDNS Version.
+
+8.2.  Flags
+
+   EDNS FLAGS is represented by _FIELD-NAME_ FLAGS and its _FIELD-TYPE_
+   is a _list_ of _mixed_:
+
+   *  _ID-NAME_ DO if the DO bit is set
+
+   *  _ID-CODE_ BITn for each n-th bit (other than DO) set
+
+   Examples of Presentation format:
+
+   FLAGS: ""
+
+   FLAGS: DO,BIT1
+
+   FLAGS: BIT3,BIT7,BIT14
+
+8.3.  Extended RCODE
+
+   Extended RCODE is represented by _FIELD-NAME_ RCODE and its _FIELD-
+   TYPE_ is a _mixed_.
+
+   For the sake of readability, it is RECOMMENDED to compute the whole
+   DNS Message Extended RCODE from both the OPT record and the DNS
+   Message Header.  If the whole DNS Message Extended RCODE is computed
+   and has a mnemonic in [IANA.RCODEs], the _FIELD-VALUE_ MAY be this
+   mnemonic as _ID-NAME_. If the whole DNS Message Extended RCODE is
+   computed and no mnemonic is available (or used), the _FIELD-VALUE_ is
+   an _int_ with the computed Extended RCODE.  If the whole DNS Message
+   Extended RCODE cannot be computed, the _FIELD-VALUE_ is an _ID-CODE_
+   EXT##, where ## stands for DNS Message Extended RCODE with the lower
+   four bits set to zero (i.e. the four-bit left shift still applies).
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 8]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   Examples of Presentation format:
+
+   RCODE: NXDOMAIN
+
+   RCODE: 3841
+
+   RCODE: EXT3840
+
+8.4.  UDP Payload Size
+
+   UDP Payload Size is represented by _FIELD-NAME_ UDPSIZE, its _FIELD-
+   TYPE_ is _int_ and _FIELD-VALUE_ is the UDP Payload Size.
+
+8.5.  Unrecognized Option
+
+   EDNS options that are not part of this specification, and their own
+   specifications do not specify their _FIELD-NAME_ and _FIELD-VALUE_
+   MUST be displayed according to this subsection.  Other options
+   (specified below or otherwise) MAY be displayed so as well.
+
+   Unrecognized EDNS option is represented by _FIELD-NAME_ OPT##, where
+   ## stands for its OPTION-CODE, its _FIELD-TYPE_ is _base16_ and
+   _FIELD-VALUE_ is its OPTION-VALUE encoded as Base16.
+
+8.6.  LLQ Option
+
+   The LLQ (OPTION-CODE 1 [RFC8764]) option is represented by _FIELD-
+   NAME_ LLQ and its _FIELD-VALUE_ is a _list_ of _int_s with LLQ-
+   VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE in this order.
+
+   Example of Presentation format:
+
+   LLQ=1,1,0,0,3600
+
+8.7.  NSID Option
+
+   The NSID (OPTION-CODE 3 [RFC5001]) option is represented by _FIELD-
+   NAME_ NSID and its _FIELD-VALUE_ is an object with two _SUBFIELD_s in
+   the following order:
+
+   *  first _FIELD-NAME_ is HEX and _FIELD-VALUE_ is a _base16_
+      representation of the OPTION-VALUE
+
+   *  second _FIELD-NAME_ is TEXT and _FIELD-VALUE_ is a _string_
+      representation of the OPTION-VALUE
+
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                 [Page 9]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   The TEXT value MAY be substituted with an empty string (for example,
+   if the OPTION-VALUE contains non-printable characters).  Within JSON,
+   the TEXT _SUBFIELD_ MAY be omitted if it is an empty string.
+
+8.8.  DAU, DHU and N3U Options
+
+   The DAU, DHU, and N3U (OPTION-CODES 5, 6, 7, respectively [RFC6975])
+   options are represented by _FIELD-NAME_s DAU, DHU, and N3U,
+   respectively, and their FIELD-VALUES are _list_s of _int_s with their
+   ALG-CODEs.
+
+   Within Presentation format, their _FIELD-VALUE_s MAY be substituted
+   with _list_s of _ID-NAME_s with the textual mnemonics of the ALG-
+   CODEs found in their respective IANA registries
+   [IANA.EDNS.DAU][IANA.EDNS.DHU][IANA.EDNS.N3U].
+
+   Examples of Presentation format:
+
+   DAU: 8,10,13,14,15
+   DHU: 1,2,4
+   N3U: 1
+
+   DAU: RSASHA256,RSASHA512,ECDSAP256SHA256,ECDSAP384SHA384,ED25519
+   DHU: SHA-1,SHA-256,SHA-384
+   N3U: SHA-1
+
+8.9.  Edns-Client-Subnet Option
+
+   The EDNS Client Subnet (OPTION-CODE 8 [RFC7871]) option is
+   represented by _FIELD-NAME_ ECS and its _FIELD-TYPE_ is a _string_.
+   If FAMILY is either IPv4 (1) or IPv6 (2) and the OPTION-LENGTH
+   matches the expected length, the _FIELD-VALUE_ is a slash-separated
+   (no spaces) tuple of:
+
+   *  the textual IPv4 or IPv6 address ([RFC1035], Section 3.4.1,
+      [RFC4291], Section 2.2), respectively
+
+   *  SOURCE PREFIX-LENGTH as a decadic number
+
+   *  SCOPE PREFIX-LENGTH as a decadic number, SHOULD be omitted
+      (including the separating slash) if zero
+
+   Otherwise, the _FIELD-VALUE_ is a _string_ with base16-representation
+   of the OPTION-VALUE.
+
+   Examples of Presentation format:
+
+   ECS: "1.2.3.4/24"
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 10]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   ECS: "1234::2/56/48"
+
+   ECS: "000520000102030405060708"
+
+8.10.  EDNS EXPIRE Option
+
+   The EDNS EXPIRE (OPTION-CODE 9 [RFC7314]) option is represented by
+   _FIELD-NAME_ EXPIRE and its _FIELD-VALUE_ is a _mixed_:
+
+   *  _ID-NAME_ NONE if OPTION-LENGTH is zero
+
+   *  _int_ with EXPIRE value otherwise
+
+8.11.  Cookie Option
+
+   The DNS Cookie (OPTION-CODE 10 [RFC7873]) option is represented by
+   _FIELD-NAME_ COOKIE and its _FIELD-VALUE_ is a _list_ of _base16_
+   with the Client Cookie and, if OPTION-LENGTH is greater than 8, the
+   Server Cookie.
+
+8.12.  Edns-Tcp-Keepalive Option
+
+   The edns-tcp-keepalive (OPTION-CODE 11 [RFC7828]) option is
+   represented by _FIELD-NAME_ KEEPALIVE and its _FIELD-VALUE_ is an
+   _int_ with the TIMEOUT in tenths of seconds.
+
+8.13.  Padding Option
+
+   The Padding (OPTION-CODE 12 [RFC7830]) option is represented by
+   _FIELD-NAME_ PADDING and its _FIELD-VALUE_ is an _object_ with two
+   _SUBFIELD_s:
+
+   *  first _FIELD-NAME_ is LENGTH and its _FIELD-VALUE_ is the OPTION-
+      LENGTH as _int_
+
+   *  second _FIELD-NAME_ is HEX and its _FIELD-VALUE_ is a _string_
+      with base16-representation of OPTION-DATA
+
+   If the OPTION-DATA consists only of zeroes (0x00 octets), the HEX
+   _SUBFIELD_ SHOULD be an empty _string_. Within JSON, the HEX
+   _SUBFIELD_ MAY be omitted if it is an empty string.
+
+8.14.  CHAIN Option
+
+   The CHAIN (OPTION-CODE 13 [RFC7901]) option is represented by _FIELD-
+   NAME_ CHAIN and its _FIELD-VALUE_ is the Closest trust point as
+   _dname_.
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 11]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+8.15.  Edns-Key-Tag Option
+
+   The edns-key-tag (OPTION-CODE 14 [RFC8145], Section 4) option is
+   represented by _FIELD-NAME_ KEYTAG and its _FIELD-VALUE_ is the list
+   of Key Tag values as _list_ of _int_s.
+
+8.16.  Extended DNS Error Option
+
+   The Extended DNS Error (OPTION-CODE 15 [RFC8914]) option is
+   represented by _FIELD-NAME_ EDE and its _FIELD-VALUE_ is an _object_
+   with three _SUBFIELD_s:
+
+   *  first _FIELD-NAME_ is CODE and its _FIELD-VALUE_ is the INFO-CODE
+      as _int_
+
+   *  second _FIELD-NAME_ is Purpose and its _FIELD-VALUE_ is the
+      Purpose (first presented in [RFC8914], Section 5.2 and then
+      governed by [IANA.EDNS.EDE]) as _string_, or an empty _string_
+
+   *  third _FIELD-NAME_ is TEXT and its _FIELD-VALUE_ is the EXTRA-TEXT
+      as _string_ (possibly of zero length)
+
+   Within JSON, the Purpose _SUBFIELD_ MAY be omitted if it is an empty
+   string.  The same applies for TEXT _SUBFIELD_.
+
+   Examples of Presentation format:
+
+   EDE: 18 "Prohibited" ""
+
+   EDE: 6 "DNSSEC Bogus" "signature too short"
+
+9.  Examples of EDNS Presentation Format
+
+   The following examples shall illustrate the features of EDNS
+   Presentation format described above.  They may not make much sense
+   and should not appear in normal DNS operation.
+
+   . 0 IN EDNS (
+       Version: 0
+       FLAGS: DO
+       RCODE: BADCOOKIE
+       UDPSIZE: 1232
+       EXPIRE: 86400
+       COOKIE: 36714f2e8805a93d,4654b4ed3279001b
+       EDE: 18 "Prohibited" "bad cookie\000"
+       OPT1234: 000004d2
+       PADDING: 113 ""
+       )
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 12]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   . 0 IN EDNS ( FLAGS: 0 RCODE: BADSIG UDPSIZE: 4096 EXPIRE: NONE
+                 NSID: 6578616d706c652e636f6d2e "example.com."
+                 DAU: 8,10 KEEPALIVE: 600 CHAIN: zerobyte\000.com.
+                 KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
+
+10.  Examples of EDNS Representation in JSON
+
+   The following examples are the JSON equivalents of the examples in
+   Section 9.  They may not make much sense and should not appear in
+   normal DNS operation.
+
+   "EDNS": {
+       "Version": 0,
+       "FLAGS": [ "DO" ],
+       "RCODE": "BADCOOKIE",
+       "UDPSIZE": 1232,
+       "EXPIRE": 86400,
+       "COOKIE": [ "36714f2e8805a93d", "4654b4ed3279001b" ],
+       "EDE": {
+           "CODE": 18,
+           "Purpose": "Prohibited",
+           "TEXT": "bad cookie\u0000"
+       },
+       "OPT1234": "000004d2",
+       "PADDING": {
+           "LENGTH": 113
+       }
+   }
+
+"EDNS": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
+          "EXPIRE": "NONE", "NSID": { "HEX": "6578616d706c652e636f6d2e",
+          "TXT": "example.com." }, "DAU": [ 8, 10 ], "KEEPALIVE": 600,
+          "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
+          "PADDING": { "LENGTH": 8, "HEX": "df24d08b0258c7de" } }
+
+11.  Guidelines for Future EDNS Options
+
+   This draft describes the presentation and JSON format of those ENDS
+   options that are known at the time of writing.  Other EDNS options
+   fall in the category of Unrecognized Options (Section 8.5), unless
+   specified otherwise.  The following guidelines shall help define
+   them.
+
+   When defining new EDNS options, it is recommended to specify their
+   _FIELD-NAME_s, _FIELD-TYPE_s and the construction of _FIELD-VALUE_s
+   so that the EDNS Presentation and JSON format comprehensibly handles
+   them.  Those formats should follow the semantics of the options'
+   values rather than the syntax in order to make them more human-
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 13]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   readable.  If it is necessary to define a new _FIELD-TYPE_, care must
+   be taken to define its representation in Presentation and JSON format
+   in a similar fashion like in this document.
+
+12.  Forward-Compatibility Considerations
+
+   This specification of ENDS Presentation and JSON format prefers
+   displaying textual mnemonics over potentially cryptic numeric values
+   wherever possible, which is desirable for human readers.  It refers
+   to several IANA tables collecting the definitions of those mnemonics.
+   Those tables may be getting updated throughout time, and for human
+   readers, it is still beneficial that the EDNS formats reflect those
+   updates.  However, this may cause difficulties for algorithms
+   implementing the reverse process of converting EDNS Presentation and/
+   or JSON format back to wire format, because they might not understand
+   some new mnemonics.  This limitation has to be taken into
+   consideration.
+
+   Similarly, new documents may define Presentation and JSON format of
+   newly defined EDNS options according to (or not according to) the
+   guidelines above (Section 11).  This is, again, beneficial for human
+   readers, as otherwise all new EDNS options would have to be
+   represented as Unrecognized Options (Section 8.5).  However, this may
+   also cause difficulties for algorithms implementing the reverse
+   process of converting EDNS Presentation and/or JSON format back to
+   wire format, because they might not understand some new options.
+
+13.  Update Representing DNS Messages in JSON
+
+   This section is not related to EDNS.  This section updates [RFC8427],
+   Section 2.6, including erratum 5439, which introduced contradicting
+   MUSTs for escaping backslashes.
+
+   In order to solve this contradiction and correctly represent a DNS
+   name in JSON, it MUST be first converted to textual Presentation
+   format according to [RFC1035], Section 5.1 (called master file format
+   in the referenced document), and the resulting <character-string>
+   subsequently is inserted into JSON as String ([RFC8259], Section 7).
+
+
+
+
+
+
+
+
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 14]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   Note that the previous paragraph prescribes the following escaping
+   strategy: In the first step, every problematic character (non-
+   printable, backslash, dot within Label, or any octet) is either
+   substituted with the sequence \DDD, where DDD is the three-digit
+   decimal ASCII code, or in some cases (backslash, dot, any printable
+   character) just prepended with a backslash.  In the second step,
+   every quote (") and backslash (\) in the resulting <character-string>
+   is prepended with another backslash.  Note that the JSON escaping
+   sequence \uXXXX (where XXXX is a hexadecimal Unicode code) is thus
+   never needed.
+
+   Moreover, the following requirements from [RFC8427] still hold: The
+   name MUST be represented as an absolute Fully-Qualified Domain Name.
+   Internationalized Domain Name (IDN) labels MUST be expressed in their
+   A-label form, as described in [RFC5890].
+
+   Example: the name with the Wire format 04005C2E2203636F6D00 can be
+   represented in JSON as:
+
+   "NAME": "\\000\\\\\\046\".com."
+
+   but also as (among other ways):
+
+   "NAME": "\\000\\092\\.\\\".c\\om."
+
+14.  IANA Considerations
+
+   This document has no IANA actions.
+
+15.  Security Considerations
+
+   This document only describes the textual representation of binary
+   data and therefore has no security impact on related protocols.
+
+   When implementing software, care must be taken to handle possibly
+   inconsistent or broken input data.
+
+16.  Acknowledgements
+
+   TODO
+
+17.  Implementation Status
+
+   *Note to the RFC Editor*: Please remove this entire appendix before
+   publication.
+
+   This version of this specification draft-peltan-edns-presentation-
+   format-02 has been implemented in Knot DNS 3.3.2.
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 15]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+18.  Change History
+
+   *Note to the RFC Editor*: Please remove this entire appendix before
+   publication.
+
+   *  edns-presentation-format-00
+
+      Initial public draft.
+
+   *  edns-presentation-format-01
+
+      Added Guidelines for Future EDNS Options, dummy IANA
+      Considerations and Security Considerations.
+
+   *  edns-presentation-format-02
+
+      Substantial re-work with common FIELD-TYPE specifications, bigger
+      changes in presentation format and smaller in JSON.
+
+19.  References
+
+19.1.  Normative References
+
+   [RFC1035]  Mockapetris, P., "Domain names - implementation and
+              specification", STD 13, RFC 1035, DOI 10.17487/RFC1035,
+              November 1987, <https://www.rfc-editor.org/info/rfc1035>.
+
+   [RFC6891]  Damas, J., Graff, M., and P. Vixie, "Extension Mechanisms
+              for DNS (EDNS(0))", STD 75, RFC 6891,
+              DOI 10.17487/RFC6891, April 2013,
+              <https://www.rfc-editor.org/info/rfc6891>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/info/rfc8259>.
+
+   [RFC8427]  Hoffman, P., "Representing DNS Messages in JSON",
+              RFC 8427, DOI 10.17487/RFC8427, July 2018,
+              <https://www.rfc-editor.org/info/rfc8427>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
+
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 16]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/info/rfc8174>.
+
+   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+              <https://www.rfc-editor.org/info/rfc4648>.
+
+   [RFC3597]  Gustafsson, A., "Handling of Unknown DNS Resource Record
+              (RR) Types", RFC 3597, DOI 10.17487/RFC3597, September
+              2003, <https://www.rfc-editor.org/info/rfc3597>.
+
+   [RFC5890]  Klensin, J., "Internationalized Domain Names for
+              Applications (IDNA): Definitions and Document Framework",
+              RFC 5890, DOI 10.17487/RFC5890, August 2010,
+              <https://www.rfc-editor.org/info/rfc5890>.
+
+   [RFC6975]  Crocker, S. and S. Rose, "Signaling Cryptographic
+              Algorithm Understanding in DNS Security Extensions
+              (DNSSEC)", RFC 6975, DOI 10.17487/RFC6975, July 2013,
+              <https://www.rfc-editor.org/info/rfc6975>.
+
+   [RFC4291]  Hinden, R. and S. Deering, "IP Version 6 Addressing
+              Architecture", RFC 4291, DOI 10.17487/RFC4291, February
+              2006, <https://www.rfc-editor.org/info/rfc4291>.
+
+19.2.  Informative References
+
+   [IANA.RCODEs]
+              "DNS RCODEs", n.d., <https://www.iana.org/assignments/dns-
+              parameters/dns-parameters.xhtml#dns-parameters-6>.
+
+   [IANA.EDNS.EDE]
+              "EDNS Extended Error Codes", n.d.,
+              <https://www.iana.org/assignments/dns-parameters/dns-
+              parameters.xhtml#extended-dns-error-codes>.
+
+   [IANA.EDNS.DAU]
+              "DNS Security Algorithm Numbers", n.d.,
+              <https://www.iana.org/assignments/dns-sec-alg-numbers/dns-
+              sec-alg-numbers.xhtml>.
+
+   [IANA.EDNS.DHU]
+              "DNSSEC DS RR Type Digest Algorithms", n.d.,
+              <https://www.iana.org/assignments/ds-rr-types/ds-rr-
+              types.xhtml#ds-rr-types-1>.
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 17]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+   [IANA.EDNS.N3U]
+              "DNSSEC NSEC3 Hash Algorithms", n.d.,
+              <https://www.iana.org/assignments/dnssec-nsec3-parameters/
+              dnssec-nsec3-parameters.xhtml#dnssec-nsec3-parameters-3>.
+
+   [RFC8764]  Cheshire, S. and M. Krochmal, "Apple's DNS Long-Lived
+              Queries Protocol", RFC 8764, DOI 10.17487/RFC8764, June
+              2020, <https://www.rfc-editor.org/info/rfc8764>.
+
+   [RFC5001]  Austein, R., "DNS Name Server Identifier (NSID) Option",
+              RFC 5001, DOI 10.17487/RFC5001, August 2007,
+              <https://www.rfc-editor.org/info/rfc5001>.
+
+   [RFC7871]  Contavalli, C., van der Gaast, W., Lawrence, D., and W.
+              Kumari, "Client Subnet in DNS Queries", RFC 7871,
+              DOI 10.17487/RFC7871, May 2016,
+              <https://www.rfc-editor.org/info/rfc7871>.
+
+   [RFC7314]  Andrews, M., "Extension Mechanisms for DNS (EDNS) EXPIRE
+              Option", RFC 7314, DOI 10.17487/RFC7314, July 2014,
+              <https://www.rfc-editor.org/info/rfc7314>.
+
+   [RFC7873]  Eastlake 3rd, D. and M. Andrews, "Domain Name System (DNS)
+              Cookies", RFC 7873, DOI 10.17487/RFC7873, May 2016,
+              <https://www.rfc-editor.org/info/rfc7873>.
+
+   [RFC7828]  Wouters, P., Abley, J., Dickinson, S., and R. Bellis, "The
+              edns-tcp-keepalive EDNS0 Option", RFC 7828,
+              DOI 10.17487/RFC7828, April 2016,
+              <https://www.rfc-editor.org/info/rfc7828>.
+
+   [RFC7830]  Mayrhofer, A., "The EDNS(0) Padding Option", RFC 7830,
+              DOI 10.17487/RFC7830, May 2016,
+              <https://www.rfc-editor.org/info/rfc7830>.
+
+   [RFC7901]  Wouters, P., "CHAIN Query Requests in DNS", RFC 7901,
+              DOI 10.17487/RFC7901, June 2016,
+              <https://www.rfc-editor.org/info/rfc7901>.
+
+   [RFC8145]  Wessels, D., Kumari, W., and P. Hoffman, "Signaling Trust
+              Anchor Knowledge in DNS Security Extensions (DNSSEC)",
+              RFC 8145, DOI 10.17487/RFC8145, April 2017,
+              <https://www.rfc-editor.org/info/rfc8145>.
+
+   [RFC8914]  Kumari, W., Hunt, E., Arends, R., Hardaker, W., and D.
+              Lawrence, "Extended DNS Errors", RFC 8914,
+              DOI 10.17487/RFC8914, October 2020,
+              <https://www.rfc-editor.org/info/rfc8914>.
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 18]
+
+Internet-Draft      edns-presentation-and-json-format       October 2023
+
+
+Authors' Addresses
+
+   Libor Peltan
+   CZ.NIC
+   Email: libor.peltan@nic.cz
+
+
+   Tom Carpay
+   NLnet Labs
+   Email: tomcarpay@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Peltan & Carpay           Expires 20 April 2024                [Page 19]
