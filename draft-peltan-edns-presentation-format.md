@@ -138,7 +138,7 @@ Example:
 }
 ~~~
 
-# Common Concept
+# Common Concept {#concept}
 
 Let's first divide the information contained in the EDNS record into <em>FIELD</em>s: `Version`, `FLAGS`, `RCODE`, and `UDPSIZE` <em>FIELD</em>s are based on the OPT record header, one other <em>FIELD</em> is based on every EDNS option that appears in the OPT record RDATA.
 Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, and <em>FIELD-VALUE</em> of type <em>FIELD-TYPE</em>, which is one of the following:
@@ -161,7 +161,7 @@ Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, an
 
 * <em>object</em>, a defined fixed number of <em>SUBFIELD</em>s, each having its <em>FIELD-NAME</em> and <em>FIELD-TYPE</em> defined according to the rules above (nested <em>object</em>s are forbidden)
 
-# EDNS Presentation Format
+# EDNS Presentation Format {#presentation}
 
 The EDNS Presentation Format follows the RR format of the master file ({{!RFC1035, Section 5.1}}), including quotation of non-printable characters, multi-line format using round brackets, and semicolons denoting comments.
 However, one difference is that &lt;character-string&gt;s are not limited in size (to 255 represented octets).
@@ -205,7 +205,7 @@ The rest depends on the <em>FIELD-TYPE</em>:
 Note that each <em>object</em> has fixed number of &lt;character-string&gt;s, other types have one.
 This is cruical for parsing, the colon plays only decorative role, strings might also end with a colon.
 
-# EDNS Representation in JSON
+# EDNS Representation in JSON {#json}
 
 The EDNS OPT record can be represented in JSON as an object called `EDNS`.
 Each <em>FIELD</em> is represented as one object member (name-value pair) ,where the name is <em>FIELD-NAME</em> and the value depends on <em>FIELD-TYPE</em>:
@@ -226,7 +226,7 @@ Each <em>FIELD</em> is represented as one object member (name-value pair) ,where
 
 Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `FLAGS`, `RCODE`, and `UDPSIZE` MUST be represented, `Version` MAY be omitted if the EDNS Version is zero.
 
-# Field Definitions
+# Field Definitions {#fieldefs}
 
 ## Version {#version}
 
