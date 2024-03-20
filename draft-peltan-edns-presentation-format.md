@@ -325,7 +325,7 @@ N3U: SHA-1
 The EDNS Client Subnet (OPTION-CODE 8 {{?RFC7871}}) option is represented by <em>FIELD-NAME</em> `ECS` and its <em>FIELD-TYPE</em> is a <em>string</em>.
 If FAMILY is either IPv4 (`1`) or IPv6 (`2`) and the OPTION-LENGTH matches the expected length, the <em>FIELD-VALUE</em> is a slash-separated (no spaces) tuple of:
 
-* the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}}, {{!RFC4291, Section 2.2}}), respectively
+* the textual IPv4 or IPv6 address ({{!RFC1035, Section 3.4.1}} or {{!RFC5952, Section 4}}, respectively)
 
 * SOURCE PREFIX-LENGTH as a decadic number
 
