@@ -288,13 +288,7 @@ Unrecognized EDNS option is represented by <em>FIELD-NAME</em> `OPT##`, where `#
 
 ## LLQ Option
 
-The LLQ (OPTION-CODE 1 {{?RFC8764}}) option is represented by <em>FIELD-NAME</em> `LLQ` and its <em>FIELD-VALUE</em> is a <em>list</em> of <em>int</em>s with LLQ-VERSION, LLQ-OPCODE, LLQ-ERROR, LLQ-ID, and LLQ-LEASE in this order.
-
-Example of Presentation format:
-
-~~~
-LLQ=1,1,0,0,3600
-~~~
+The LLQ (OPTION-CODE 1 {{?RFC8764}}) option is represented as unrecognized ([unrecognized](#unrecognized)), since this option has been deprecated since year 2020.
 
 ## NSID Option
 
