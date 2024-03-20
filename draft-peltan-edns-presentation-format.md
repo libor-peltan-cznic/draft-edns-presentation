@@ -140,7 +140,7 @@ Example:
 
 # Common Concept {#concept}
 
-Let's first divide the information contained in the EDNS record into <em>FIELD</em>s: `Version`, `FLAGS`, `RCODE`, and `UDPSIZE` <em>FIELD</em>s are based on the OPT record header, one other <em>FIELD</em> is based on every EDNS option that appears in the OPT record RDATA.
+Let's first divide the information contained in the EDNS record into <em>FIELD</em>s: `version`, `flags`, `rcode`, and `udpsize` <em>FIELD</em>s are based on the OPT record header, one other <em>FIELD</em> is based on every EDNS option that appears in the OPT record RDATA.
 Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, and <em>FIELD-VALUE</em> of type <em>FIELD-TYPE</em>, which is one of the following:
 
 * <em>int</em>, a non-negative integer
@@ -181,7 +181,7 @@ If it is present, it MUST be `ANY`.
 * TYPE MUST be `EDNS`.
 
 RDATA consists of &lt;character-string&gt;s, each <em>FIELD</em> is represented by at least two of them.
-First represented <em>FIELD</em>s are `Version`, `FLAGS`, `RCODE`, and `UDPSIZE` in this order; however, `Version` MAY be omitted if the EDNS Version is zero.
+First represented <em>FIELD</em>s are `version`, `flags`, `rcode`, and `udpsize` in this order; however, `version` MAY be omitted if the EDNS Version is zero.
 The rest of <em>FIELD</em>s respect the EDNS options in the same order as they appear in the OPT record, including possibly repeated options.
 The following paragraph defines how a single <em>FIELD</em> is represented with &lt;character-string&gt;s.
 
@@ -224,17 +224,17 @@ Each <em>FIELD</em> is represented as one object member (name-value pair) ,where
 
 * <em>object</em> is represented as a JSON object with each <em>SUBFIELD</em> represented as one of its member according to rules above (note that nested <em>object</em>s are forbidden)
 
-Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `FLAGS`, `RCODE`, and `UDPSIZE` MUST be represented, `Version` MAY be omitted if the EDNS Version is zero.
+Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `flags`, `rcode`, and `udpsize` MUST be represented, `version` MAY be omitted if the EDNS Version is zero.
 
 # Field Definitions {#fieldefs}
 
 ## Version {#version}
 
-EDNS Version is represented by <em>FIELD-NAME</em> `Version`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the EDNS Version.
+EDNS Version is represented by <em>FIELD-NAME</em> `version`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the EDNS Version.
 
 ## Flags {#eflags}
 
-EDNS FLAGS is represented by <em>FIELD-NAME</em> `FLAGS` and its <em>FIELD-TYPE</em> is a <em>list</em> of <em>mixed</em>:
+EDNS FLAGS is represented by <em>FIELD-NAME</em> `flags` and its <em>FIELD-TYPE</em> is a <em>list</em> of <em>mixed</em>:
 
 * <em>ID-NAME</em> `DO` if the DO bit is set
 
@@ -243,20 +243,20 @@ EDNS FLAGS is represented by <em>FIELD-NAME</em> `FLAGS` and its <em>FIELD-TYPE<
 Examples of Presentation format:
 
 ~~~
-FLAGS: ""
+flags: ""
 ~~~
 
 ~~~
-FLAGS: DO,BIT1
+flags: DO,BIT1
 ~~~
 
 ~~~
-FLAGS: BIT3,BIT7,BIT14
+flags: BIT3,BIT7,BIT14
 ~~~
 
 ## Extended RCODE {#extrcode}
 
-Extended RCODE is represented by <em>FIELD-NAME</em> `RCODE` and its <em>FIELD-TYPE</em> is a <em>mixed</em>.
+Extended RCODE is represented by <em>FIELD-NAME</em> `rcode` and its <em>FIELD-TYPE</em> is a <em>mixed</em>.
 
 For the sake of readability, it is RECOMMENDED to compute the whole DNS Message Extended RCODE from both the OPT record and the DNS Message Header.
 If the whole DNS Message Extended RCODE is computed and has a mnemonic in {{IANA.RCODEs}}, the <em>FIELD-VALUE</em> MAY be this mnemonic as <em>ID-NAME</em>.
@@ -266,18 +266,18 @@ If the whole DNS Message Extended RCODE cannot be computed, the <em>FIELD-VALUE<
 Examples of Presentation format:
 
 ~~~
-RCODE: NXDOMAIN
+rcode: NXDOMAIN
 ~~~
 ~~~
-RCODE: 3841
+rcode: 3841
 ~~~
 ~~~
-RCODE: EXT3840
+rcode: EXT3840
 ~~~
 
 ## UDP Payload Size {#udpsize}
 
-UDP Payload Size is represented by <em>FIELD-NAME</em> `UDPSIZE`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the UDP Payload Size.
+UDP Payload Size is represented by <em>FIELD-NAME</em> `udpsize`, its <em>FIELD-TYPE</em> is <em>int</em> and <em>FIELD-VALUE</em> is the UDP Payload Size.
 
 ## Unrecognized Option {#unrecognized}
 
@@ -409,10 +409,10 @@ They may not make much sense and should not appear in normal DNS operation.
 
 ~~~
 . 0 IN EDNS (
-    Version: 0
-    FLAGS: DO
-    RCODE: BADCOOKIE
-    UDPSIZE: 1232
+    version: 0
+    flags: DO
+    rcode: BADCOOKIE
+    udpsize: 1232
     EXPIRE: 86400
     COOKIE: 36714f2e8805a93d,4654b4ed3279001b
     EDE: 18 "Prohibited" "bad cookie\000"
@@ -421,7 +421,7 @@ They may not make much sense and should not appear in normal DNS operation.
     )
 ~~~
 ~~~
-. 0 IN EDNS ( FLAGS: 0 RCODE: BADSIG UDPSIZE: 4096 EXPIRE: NONE
+. 0 IN EDNS ( flags: 0 rcode: BADSIG udpsize: 4096 EXPIRE: NONE
               NSID: 6578616d706c652e636f6d2e "example.com."
               DAU: 8,10 KEEPALIVE: 600 CHAIN: zerobyte\000.com.
               KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
@@ -434,10 +434,10 @@ They may not make much sense and should not appear in normal DNS operation.
 
 ~~~
 "EDNS": {
-    "Version": 0,
-    "FLAGS": [ "DO" ],
-    "RCODE": "BADCOOKIE",
-    "UDPSIZE": 1232,
+    "version": 0,
+    "flags": [ "DO" ],
+    "rcode": "BADCOOKIE",
+    "udpsize": 1232,
     "EXPIRE": 86400,
     "COOKIE": [ "36714f2e8805a93d", "4654b4ed3279001b" ],
     "EDE": {
@@ -452,7 +452,7 @@ They may not make much sense and should not appear in normal DNS operation.
 }
 ~~~
 ~~~
-"EDNS": { "FLAGS": [ ], "RCODE": "BADSIG", "UDPSIZE": 4096,
+"EDNS": { "flags": [ ], "rcode": "BADSIG", "udpsize": 4096,
           "EXPIRE": "NONE", "NSID": { "HEX": "6578616d706c652e636f6d2e",
           "TXT": "example.com." }, "DAU": [ 8, 10 ], "KEEPALIVE": 600,
           "CHAIN": "zerobyte\\000.com.", "KEYTAG": [ 36651, 6113 ],
