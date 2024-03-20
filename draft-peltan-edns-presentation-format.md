@@ -415,6 +415,16 @@ EDE: 18 "Prohibited" ""
 EDE: 6 "DNSSEC Bogus" "signature too short"
 ~~~
 
+## Report-Channel Option
+
+The Report-Channel (OPTION-CODE 18) option is represented by <em>FIELD-NAME</em> `REPORT` and its <em>FIELD-VALUE</em> is the AGENT DOMAIN as <em>dname</em>.
+
+Example of JSON format:
+
+~~~
+"REPORT": "back\\\\slash.example.com."
+~~~
+
 # Examples of EDNS Presentation Format {#eexamples}
 
 The following examples shall illustrate the features of EDNS Presentation format described above.
@@ -545,6 +555,7 @@ The initial values for existing entries are according to the table below:
 |    13 | CHAIN              | CHAIN     |
 |    14 | edns-key-tag       | KEYTAG    |
 |    15 | Extended DNS Error | EDE       |
+|    18 | Report-Channel     | REPORT    |
 
 The values for entries and rows that are unassigned, reserved or on-hold are to be left blank with no Mnemonic defined.
 
