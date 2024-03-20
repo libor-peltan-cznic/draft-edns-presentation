@@ -28,6 +28,10 @@ informative:
     target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6
     title: DNS RCODEs
 
+  IANA.EDNS.Options:
+    target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-11
+    title: DNS EDNS0 Option Codes
+
   IANA.EDNS.EDE:
     target: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#extended-dns-error-codes
     title: EDNS Extended Error Codes
@@ -140,8 +144,15 @@ Example:
 
 # Common Concept {#concept}
 
-Let's first divide the information contained in the EDNS record into <em>FIELD</em>s: `version`, `flags`, `rcode`, and `udpsize` <em>FIELD</em>s are based on the OPT record header, one other <em>FIELD</em> is based on every EDNS option that appears in the OPT record RDATA.
-Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, and <em>FIELD-VALUE</em> of type <em>FIELD-TYPE</em>, which is one of the following:
+In order to represent the binary data from EDNS option textually, we first define the abstract concept of <em>FIELD</em>s.
+First four <em>FIELD</em>s represent the OPT record header, one more <em>FIELD</em> represents every EDNS option that appears in the OPT record RDATA.
+Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string; a specific <em>FIELD-TYPE</em> from the list below; and prescribed way how to construct the <em>FIELD-VALUE</em> from given binary data.
+Based on those, the Presentaion and JSON formats are defined in [presentation](#presentation) and [json](#json), respectively.
+
+The <em>FIELD-NAME</em>s of <em>FIELD</em>s representing the OPT record header are `version`, `flags`, `rcode` and `udpsize`.
+The <em>FIELD-NAME</em>s of <em>FIELD</em>s representing EDNS options are defined as their <em>Mnemonic</em>s according to {{IANA.EDNS.Options}} (see also [iana](#iana)).
+
+A <em>FIELD-TYPE</em> can be one of following:
 
 * <em>int</em>, a non-negative integer
 
@@ -160,6 +171,8 @@ Each <em>FIELD</em> has a defined <em>FIELD-NAME</em>, which is an ID-string, an
 * <em>string</em>, a string of arbitrary octets where quoting and escaping is used to represent it as ASCII string
 
 * <em>object</em>, a defined fixed number of <em>SUBFIELD</em>s, each having its <em>FIELD-NAME</em> and <em>FIELD-TYPE</em> defined according to the rules above (nested <em>object</em>s are forbidden)
+
+The <em>FIELD-TYPE</em> and the construction of <em>FIELD-VALUE</em> of each <em>FIELD</em> is defined in [fieldefs](#fieldefs).
 
 # EDNS Presentation Format {#presentation}
 
@@ -469,6 +482,8 @@ When defining new EDNS options, it is recommended to specify their <em>FIELD-NAM
 Those formats should follow the semantics of the options' values rather than the syntax in order to make them more human-readable.
 If it is necessary to define a new <em>FIELD-TYPE</em>, care must be taken to define its representation in Presentation and JSON format in a similar fashion like in this document.
 
+The <em>FIELD-NAME</em> MUST always be an ID-string and MUST be added as new option's Mnemonic when requesting IANA to add respective entry to the table {{IANA.EDNS.Options}}.
+
 # Forward-Compatibility Considerations {#future}
 
 This specification of ENDS Presentation and JSON format prefers displaying textual mnemonics over potentially cryptic numeric values wherever possible, which is desirable for human readers.
@@ -511,7 +526,27 @@ but also as (among other ways):
 
 # IANA Considerations {#iana}
 
-This document has no IANA actions.
+IANA is requested to augment the table {{IANA.EDNS.Options}} with a new column titled "Mnemonic", possibly as third column between "Name" and "Status".
+The initial values for existing entries are according to the table below:
+
+| Value | Name               | Mnemonic  |
+|------:|:-------------------|:----------|
+|     1 | LLQ                | LLQ       |
+|     2 | UL                 | UL        |
+|     3 | NSID               | NSID      |
+|     5 | DAU                | DAU       |
+|     6 | DHU                | DHU       |
+|     7 | N3U                | N3U       |
+|     8 | edns-client-subnet | ECS       |
+|     9 | EDNS EXPIRE        | EXPIRE    |
+|    10 | COOKIE             | COOKIE    |
+|    11 | edns-tcp-keepalive | KEEPALIVE |
+|    12 | Padding            | PADDING   |
+|    13 | CHAIN              | CHAIN     |
+|    14 | edns-key-tag       | KEYTAG    |
+|    15 | Extended DNS Error | EDE       |
+
+The values for entries and rows that are unassigned, reserved or on-hold are to be left blank with no Mnemonic defined.
 
 # Security Considerations {#security}
 
