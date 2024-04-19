@@ -591,4 +591,10 @@ This version of this specification draft-peltan-edns-presentation-format-02 has 
 
 > Substantial re-work with common FIELD-TYPE specifications, bigger changes in presentation format and smaller in JSON.
 
+* edns-presentation-format-03
+
+> Added IANA Actions for additional column for Mnemonic.
+> Added Report-Channel option and removed LLQ.
+> Improved Common concept, tiny fixes.
+
 --- back
