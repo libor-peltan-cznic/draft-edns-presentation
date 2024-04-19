@@ -66,7 +66,7 @@ This document describes such a Presentation Format of the OPT pseudo-record.
 It is advised to use this when displaying an OPT pseudo-record to humans.
 It is recommended to use this when the textual format is expected to be machine-processed further.
 
-The JSON{{!RFC8259}} representation{{!RFC8427}} of DNS messages is also helpful as both human-readable and machine-readable format (despite the limitation in non-preservation of the order of options, which prevents reversing the conversion unambiguously), but it did not define a JSON representation of EDNS option pseudo-record.
+The JSON{{!RFC8259}} representation{{!RFC8427}} of DNS messages is also helpful as both human-readable and machine-readable format (despite the limitation in non-preservation of the order of options and possible issues with repeated options, which prevents reversing the conversion unambiguously), but it did not define a JSON representation of EDNS option pseudo-record.
 This document defines it.
 
 The aforementioned document{{!RFC8427}} also defined ambiguous and possibly conflicting rules for escaping special characters when representing DNS names in JSON.
@@ -237,7 +237,7 @@ Each <em>FIELD</em> is represented as one object member (name-value pair) ,where
 
 * <em>object</em> is represented as a JSON object with each <em>SUBFIELD</em> represented as one of its member according to rules above (note that nested <em>object</em>s are forbidden)
 
-Note that the order of members is not preserved in JSON. The <em>FIELD</em>s `flags`, `rcode`, and `udpsize` MUST be represented, `version` MAY be omitted if the EDNS Version is zero.
+Note that the order of members is not preserved in JSON and that repeated options might cause issues in JSON. The <em>FIELD</em>s `flags`, `rcode`, and `udpsize` MUST be represented, `version` MAY be omitted if the EDNS Version is zero.
 
 # Field Definitions {#fieldefs}
 
@@ -431,7 +431,7 @@ The following examples shall illustrate the features of EDNS Presentation format
 They may not make much sense and should not appear in normal DNS operation.
 
 ~~~
-. 0 IN EDNS (
+. 0 ANY EDNS (
     version: 0
     flags: DO
     rcode: BADCOOKIE
@@ -444,10 +444,10 @@ They may not make much sense and should not appear in normal DNS operation.
     )
 ~~~
 ~~~
-. 0 IN EDNS ( flags: 0 rcode: BADSIG udpsize: 4096 EXPIRE: NONE
-              NSID: 6578616d706c652e636f6d2e "example.com."
-              DAU: 8,10 KEEPALIVE: 600 CHAIN: zerobyte\000.com.
-              KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
+. 0 ANY EDNS ( flags: 0 rcode: BADSIG udpsize: 4096 EXPIRE: NONE
+               NSID: 6578616d706c652e636f6d2e "example.com."
+               DAU: 8,10 KEEPALIVE: 600 CHAIN: zerobyte\000.com.
+               KEYTAG: 36651,6113 PADDING: 8 "df24d08b0258c7de" )
 ~~~
 
 # Examples of EDNS Representation in JSON {#jexamples}
